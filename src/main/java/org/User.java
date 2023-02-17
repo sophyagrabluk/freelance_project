@@ -3,6 +3,7 @@ package org;
 import lombok.Data;
 
 import java.sql.Timestamp;
+
 @Data
 public class User {
     int id;

@@ -3,6 +3,7 @@ package Service;
 import org.User;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 
 public class UserCrudService {
 
@@ -17,7 +18,7 @@ public class UserCrudService {
     public User getUserById(int id) {
         User user = new User();
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM user_table WHERE id=?");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM users_table WHERE id=?");
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
 
@@ -34,15 +35,15 @@ public class UserCrudService {
             user.setDeleted(result.getBoolean("is_deleted"));
             user.setRating(result.getDouble("rating"));
         } catch (SQLException e) {
-            System.out.println("Ooops! It's error...");
+            System.out.println("Ooops! It's error..." + e);
         }
         return user;
     }
 
     public boolean createUser(String firstName, String lastName, String country, String city, String login, String password) {
         int result = 0;
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/movie_db", "postgres", "root")) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO users_table (id, firstName, lastName, country, city, login, password, created, changed, is_deleted, rating)" +
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO users_table (id, first_name, last_name, country, city, login, password, created, changed, is_deleted, rating)" +
                     "VALUES (DEFAULT,?, ?, ?, ?, ?, ?, ?, ?, DEFAULT, DEFAULT)");
             statement.setString(1, firstName);
             statement.setString(2, lastName);
@@ -50,19 +51,19 @@ public class UserCrudService {
             statement.setString(4, city);
             statement.setString(5, login);
             statement.setString(6, password);
-            statement.setNull(7, Types.TIMESTAMP); // created
-            statement.setNull(8, Types.TIMESTAMP); // changed
+            statement.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now())); // created
+            statement.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now())); // changed
 
             result = statement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Ooops! It's error...");
+            System.out.println("Ooops! It's error..." + e);
         }
         return result == 1;
     }
 
     public boolean updateUser(int id, String firstName, String lastName, String country, String city, String login, String password) {
         int result = 0;
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/movie_db", "postgres", "root")) {
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
             PreparedStatement statement = connection.prepareStatement("UPDATE users_table SET firstName=?, lastName=?, country=?, city=?, login=?, password=?, changed=? WHERE id =?)");
             statement.setString(1, firstName);
             statement.setString(2, lastName);
@@ -70,25 +71,25 @@ public class UserCrudService {
             statement.setString(4, city);
             statement.setString(5, login);
             statement.setString(6, password);
-            statement.setNull(7, Types.TIMESTAMP); // changed
+            statement.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now())); // changed
             statement.setInt(8, id);
 
             result = statement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Ooops! It's error...");
+            System.out.println("Ooops! It's error..." + e);
         }
         return result == 1;
     }
 
         public boolean deleteUser ( int id){
             int result = 0;
-            try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/movie_db", "postgres", "root")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
                 PreparedStatement statement = connection.prepareStatement("UPDATE  users_table SET is_deleted = TRUE WHERE id =?");
                 statement.setInt(1, id);
 
                 result = statement.executeUpdate();
             } catch (SQLException e) {
-                System.out.println("Ooops! It's error...");
+                System.out.println("Ooops! It's error..." + e);
             }
             return result == 1;
         }

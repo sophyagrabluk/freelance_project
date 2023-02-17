@@ -9,4 +9,5 @@ public class Service {
     String section;
     int usersId;
     String description;
+    boolean isDeleted;
 }
