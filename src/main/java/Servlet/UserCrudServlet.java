@@ -2,6 +2,7 @@ package Servlet;
 
 import Service.UserCrudService;
 import org.User;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
