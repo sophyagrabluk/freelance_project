@@ -1,4 +1,4 @@
-<%@ page import="org.Feedback" %>
+<%@ page import="com.tms.domain.Feedback" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% Feedback feedbackJsp = (Feedback)request.getAttribute("feedback"); %>
 <html>

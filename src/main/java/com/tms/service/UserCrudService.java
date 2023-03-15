@@ -1,6 +1,6 @@
-package Service;
+package com.tms.service;
 
-import org.User;
+import com.tms.domain.User;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -61,6 +61,7 @@ public class UserCrudService {
         return result == 1;
     }
 
+
     public boolean updateUser(int id, String firstName, String lastName, String country, String city, String login, String password) {
         int result = 0;
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
@@ -81,16 +82,16 @@ public class UserCrudService {
         return result == 1;
     }
 
-        public boolean deleteUser ( int id){
-            int result = 0;
-            try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
-                PreparedStatement statement = connection.prepareStatement("UPDATE  users_table SET is_deleted = TRUE WHERE id =?");
-                statement.setInt(1, id);
+    public boolean deleteUser(int id) {
+        int result = 0;
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
+            PreparedStatement statement = connection.prepareStatement("UPDATE  users_table SET is_deleted = TRUE WHERE id =?");
+            statement.setInt(1, id);
 
-                result = statement.executeUpdate();
-            } catch (SQLException e) {
-                System.out.println("Ooops! It's error..." + e);
-            }
-            return result == 1;
+            result = statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Ooops! It's error..." + e);
         }
+        return result == 1;
     }
+}

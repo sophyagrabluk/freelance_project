@@ -1,6 +1,6 @@
-package Servlet;
+package com.tms.servlet;
 
-import Service.AddServiceToUserService;
+import com.tms.service.AddServiceToUserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

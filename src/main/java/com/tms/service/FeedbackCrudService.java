@@ -1,7 +1,6 @@
-package Service;
+package com.tms.service;
 
-import org.Feedback;
-import org.User;
+import com.tms.domain.Feedback;
 
 import java.sql.*;
 import java.time.LocalDateTime;

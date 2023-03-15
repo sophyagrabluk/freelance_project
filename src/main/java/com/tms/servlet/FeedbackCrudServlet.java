@@ -1,7 +1,7 @@
-package Servlet;
+package com.tms.servlet;
 
-import Service.FeedbackCrudService;
-import org.Feedback;
+import com.tms.service.FeedbackCrudService;
+import com.tms.domain.Feedback;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

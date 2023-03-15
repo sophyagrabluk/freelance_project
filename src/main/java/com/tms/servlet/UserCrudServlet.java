@@ -1,8 +1,7 @@
-package Servlet;
+package com.tms.servlet;
 
-import Service.UserCrudService;
-import org.User;
-import org.apache.log4j.Logger;
+import com.tms.service.UserCrudService;
+import com.tms.domain.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -46,6 +45,9 @@ public class UserCrudServlet extends HttpServlet {
         String city = req.getParameter("city");
         String login = req.getParameter("login");
         String password = req.getParameter("password");
+        String email = req.getParameter("email");
+        String phoneNumber = req.getParameter("phoneNumber");
+        String telegram = req.getParameter("telegram");
         boolean result = userCrudService.createUser(firstName, lastName, country, city, login, password);
     }
 

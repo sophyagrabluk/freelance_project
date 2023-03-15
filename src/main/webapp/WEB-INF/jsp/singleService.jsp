@@ -1,4 +1,4 @@
-<%@ page import="org.Service" %>
+<%@ page import="com.tms.domain.Service" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% Service serviceJsp = (Service)request.getAttribute("service"); %>
 <html>

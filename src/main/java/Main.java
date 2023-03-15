@@ -1,10 +1,15 @@
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
+import com.tms.domain.Service;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
+@EnableAspectJAutoProxy
+@ComponentScan("com.tms")
 public class Main {
-    private static final Logger log = Logger.getLogger(Main.class);
     public static void main(String[] args) {
-        log.info("It's our first log");
-
+        ApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
+        Service ourService = (Service) context.getBean("service");
+        System.out.println(ourService);
     }
 }

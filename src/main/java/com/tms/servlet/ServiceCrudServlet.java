@@ -1,7 +1,7 @@
-package Servlet;
+package com.tms.servlet;
 
-import Service.ServiceCrudService;
-import org.Service;
+import com.tms.service.ServiceCrudService;
+import com.tms.domain.Service;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

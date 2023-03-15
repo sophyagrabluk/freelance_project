@@ -1,9 +1,11 @@
-package org;
+package com.tms.domain;
 
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 
+@Component
 @Data
 public class User {
     int id;

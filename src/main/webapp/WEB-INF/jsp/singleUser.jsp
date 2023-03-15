@@ -1,4 +1,4 @@
-<%@ page import="org.User" %>
+<%@ page import="com.tms.domain.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% User userJsp = (User)request.getAttribute("user"); %>
 <html>
