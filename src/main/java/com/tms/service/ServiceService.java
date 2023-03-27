@@ -1,11 +1,12 @@
 package com.tms.service;
 
-import com.tms.domain.Service;
-import com.tms.domain.User;
+import org.springframework.stereotype.Service;
 
 import java.sql.*;
 
-public class ServiceCrudService {
+@Service
+public class ServiceService {
+
     {
         try {
             Class.forName("org.postgresql.Driver");
@@ -13,9 +14,9 @@ public class ServiceCrudService {
             e.printStackTrace();
         }
     }
-    User user;
-    public Service getServiceById(int id) {
-        Service service = new Service(user);
+
+    public com.tms.domain.Service getServiceById(int id) {
+        com.tms.domain.Service service = new com.tms.domain.Service();
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM services_table WHERE id=?");
             statement.setInt(1, id);
@@ -77,4 +78,5 @@ public class ServiceCrudService {
         }
         return result == 1;
     }
+
 }

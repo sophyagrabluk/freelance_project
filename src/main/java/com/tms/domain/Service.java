@@ -14,10 +14,4 @@ public class Service {
     String description;
     boolean isDeleted;
 
-    private User user;
-
-    @Autowired
-    public Service(User user) {
-        this.user = user;
-    }
 }

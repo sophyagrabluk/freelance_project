@@ -1,0 +1,62 @@
+package com.tms.controller;
+
+import com.tms.domain.Service;
+import com.tms.service.ServiceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequestMapping("/service")
+public class ServiceController {
+
+    ServiceService serviceService;
+
+    @Autowired
+    public ServiceController(ServiceService serviceService) {
+        this.serviceService = serviceService;
+    }
+
+    @GetMapping("/{id}")
+    public String getServiceById(@PathVariable int id, Model model) {
+        Service service = serviceService.getServiceById(id);
+        model.addAttribute("service", service);
+        return "singleService";
+    }
+
+    @PostMapping
+    public String createService(
+            @RequestParam String name,
+            @RequestParam String section,
+            @RequestParam String description
+    ) {
+        boolean result = serviceService.createService(name, section, description);
+        if (result) {
+            return "successfully";
+        }
+        return "unsuccessfully";
+    }
+
+    @PutMapping
+    public String updateService(
+            @RequestParam String id,
+            @RequestParam String name,
+            @RequestParam String section,
+            @RequestParam String description
+    ) {
+        boolean result = serviceService.updateService(Integer.parseInt(id), name, section, description);
+        if (result) {
+            return "successfully";
+        }
+        return "unsuccessfully";
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteService(@PathVariable int id) {
+        if (serviceService.deleteService(id)) {
+            return "successfully";
+        }
+        return "unsuccessfully";
+    }
+}

@@ -1,12 +1,14 @@
 package com.tms.service;
 
 import com.tms.domain.User;
+import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
-public class UserCrudService {
-
+@Service
+public class UserService {
     {
         try {
             Class.forName("org.postgresql.Driver");
@@ -40,6 +42,33 @@ public class UserCrudService {
         return user;
     }
 
+    public ArrayList<User> getAllUsers() {
+        ArrayList<User> allUsers =new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM users_table");
+
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                User user = new User();
+                user.setId(result.getInt("id"));
+                user.setFirstName(result.getString("first_name"));
+                user.setLastName(result.getString("last_name"));
+                user.setCountry(result.getString("country"));
+                user.setCity(result.getString("city"));
+                user.setLogin(result.getString("login"));
+                user.setPassword(result.getString("password"));
+                user.setCreated(result.getTimestamp("created"));
+                user.setChanged(result.getTimestamp("changed"));
+                user.setDeleted(result.getBoolean("is_deleted"));
+                user.setRating(result.getDouble("rating"));
+                allUsers.add(user);
+            }
+        } catch (SQLException e) {
+            System.out.println("Ooops! It's error..." + e);
+        }
+        return allUsers;
+    }
+
     public boolean createUser(String firstName, String lastName, String country, String city, String login, String password) {
         int result = 0;
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
@@ -65,7 +94,7 @@ public class UserCrudService {
     public boolean updateUser(int id, String firstName, String lastName, String country, String city, String login, String password) {
         int result = 0;
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
-            PreparedStatement statement = connection.prepareStatement("UPDATE users_table SET firstName=?, lastName=?, country=?, city=?, login=?, password=?, changed=? WHERE id =?)");
+            PreparedStatement statement = connection.prepareStatement("UPDATE users_table SET first_name=?, last_name=?, country=?, city=?, login=?, password=?, changed=? WHERE id =?");
             statement.setString(1, firstName);
             statement.setString(2, lastName);
             statement.setString(3, country);
@@ -87,7 +116,6 @@ public class UserCrudService {
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
             PreparedStatement statement = connection.prepareStatement("UPDATE  users_table SET is_deleted = TRUE WHERE id =?");
             statement.setInt(1, id);
-
             result = statement.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Ooops! It's error..." + e);

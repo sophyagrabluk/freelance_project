@@ -3,12 +3,13 @@ package com.tms.aspect;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 
+@Aspect
+@Component
 public class LoggerAspect {
     private final Logger logger = Logger.getLogger(this.getClass());
 
@@ -23,11 +24,14 @@ public class LoggerAspect {
     }
 
     @Around("within (com.tms.*)")
-    public void getTime(ProceedingJoinPoint proceedingJoinPoint, JoinPoint joinPoint) throws Throwable {
+    public void getTime(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         LocalTime start = LocalTime.now();
         proceedingJoinPoint.proceed();
         LocalTime finish = LocalTime.now();
-        logger.info("Method " + joinPoint.getSignature() + " work time is: " + (finish.getNano()-start.getNano()));
-
+        logger.info("Method " + proceedingJoinPoint.getSignature() + " work time is: " + (finish.getNano()-start.getNano()));
+    }
+    @AfterThrowing(value = "within(com.tms.*)", throwing = "error")
+    public void getLogAfterThrowing(Throwable error) {
+        logger.warn("We have trouble! " + error);
     }
 }

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/addService")
+//@WebServlet("/addService")
 public class AddServiceToUser extends HttpServlet {
 
     AddServiceToUserService addServiceToUserService = new AddServiceToUserService();
