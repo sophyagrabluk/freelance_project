@@ -67,11 +67,20 @@ public class UserController {
         return "unsuccessfully";
     }
 
-        @DeleteMapping("/{id}")
-        public String deleteUser(@PathVariable int id) {
-            if (userService.deleteUser(id)) {
-                return "successfully";
-            }
-            return "unsuccessfully";
+    @DeleteMapping("/{id}")
+    public String deleteUser(@PathVariable int id) {
+        if (userService.deleteUser(id)) {
+            return "successfully";
         }
+        return "unsuccessfully";
+    }
+
+    @PostMapping("/{userId}/{serviceId}")
+    public String addServiceToUser(@PathVariable int userId, @PathVariable int serviceId) {
+        boolean result = userService.addServiceToUser(userId, serviceId);
+        if (result) {
+            return "successfully";
+        }
+        return "unsuccessfully";
+    }
 }

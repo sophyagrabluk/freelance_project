@@ -1,11 +1,14 @@
 package com.tms.controller;
 
 import com.tms.domain.Service;
+import com.tms.domain.User;
 import com.tms.service.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/service")
@@ -22,6 +25,13 @@ public class ServiceController {
     public String getServiceById(@PathVariable int id, Model model) {
         Service service = serviceService.getServiceById(id);
         model.addAttribute("service", service);
+        return "singleService";
+    }
+
+    @GetMapping
+    public String getAllServices(Model model) {
+        ArrayList<Service> services = serviceService.getAllServices();
+        model.addAttribute("user", services);
         return "singleService";
     }
 

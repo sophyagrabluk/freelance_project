@@ -1,8 +1,10 @@
 package com.tms.service;
 
+import com.tms.domain.User;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 @Service
 public class ServiceService {
@@ -32,6 +34,27 @@ public class ServiceService {
             System.out.println("Ooops! It's error..." + e);
         }
         return service;
+    }
+
+    public ArrayList<com.tms.domain.Service> getAllServices() {
+        ArrayList<com.tms.domain.Service> allService =new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM services_table");
+
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                com.tms.domain.Service service = new com.tms.domain.Service();
+                service.setId(result.getInt("id"));
+                service.setName(result.getString("name"));
+                service.setSection(result.getString("section"));
+                service.setDescription(result.getString("description"));
+                service.setDeleted(result.getBoolean("is_deleted"));
+                allService.add(service);
+            }
+        } catch (SQLException e) {
+            System.out.println("Ooops! It's error..." + e);
+        }
+        return allService;
     }
 
     public boolean createService(String name, String section, String description) {
