@@ -3,6 +3,9 @@ package com.tms.domain;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 @Component
@@ -13,10 +16,13 @@ public class User {
     String lastName;
     String country;
     String city;
+    @Size(min = 5, max = 30)
+    @Pattern(regexp = "[a-z0-9]*")
     String login;
     String password;
     Timestamp created;
     Timestamp changed;
     boolean isDeleted;
-    double rating;
+    @Max(5)
+    int rating;
 }

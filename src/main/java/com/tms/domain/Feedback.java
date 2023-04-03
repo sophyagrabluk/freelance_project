@@ -3,6 +3,7 @@ package com.tms.domain;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Max;
 import java.sql.Timestamp;
 
 @Component
@@ -10,7 +11,8 @@ import java.sql.Timestamp;
 public class Feedback {
     private int id;
     private String comment;
-    private double rating;
+    @Max(5)
+    private int rating;
     private Timestamp created;
     private int toWhichUserId;
     private int fromWhichUserId;

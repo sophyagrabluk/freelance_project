@@ -57,14 +57,14 @@ public class ServiceService {
         return allService;
     }
 
-    public boolean createService(String name, String section, String description) {
+    public boolean createService(com.tms.domain.Service service) {
         int result = 0;
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO services_table (id, name, section, description, is_deleted)" +
                     "VALUES (DEFAULT,?, ?, ?, DEFAULT)");
-            statement.setString(1, name);
-            statement.setString(2, section);
-            statement.setString(3, description);
+            statement.setString(1, service.getName());
+            statement.setString(2, service.getSection());
+            statement.setString(3, service.getDescription());
 
             result = statement.executeUpdate();
         } catch (SQLException e) {
@@ -73,14 +73,14 @@ public class ServiceService {
         return result == 1;
     }
 
-    public boolean updateService(int id, String name, String section, String description) {
+    public boolean updateService(com.tms.domain.Service service) {
         int result = 0;
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
-            PreparedStatement statement = connection.prepareStatement("UPDATE services_table SET name=?, section=?, description=? WHERE id =?)");
-            statement.setString(1, name);
-            statement.setString(2, section);
-            statement.setString(3, description);
-            statement.setInt(4, id);
+            PreparedStatement statement = connection.prepareStatement("UPDATE services_table SET name=?, section=?, description=? WHERE id =?");
+            statement.setString(1, service.getName());
+            statement.setString(2, service.getSection());
+            statement.setString(3, service.getDescription());
+            statement.setInt(4, service.getId());
 
             result = statement.executeUpdate();
         } catch (SQLException e) {

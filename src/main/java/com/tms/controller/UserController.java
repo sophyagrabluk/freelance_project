@@ -2,11 +2,14 @@ package com.tms.controller;
 
 import com.tms.domain.User;
 import com.tms.service.UserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 
 @Controller
@@ -14,6 +17,7 @@ import java.util.ArrayList;
 public class UserController {
 
     UserService userService;
+    private final Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
     public UserController(UserService userService) {
@@ -35,15 +39,12 @@ public class UserController {
     }
 
     @PostMapping
-    public String createUser(
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String country,
-            @RequestParam String city,
-            @RequestParam String login,
-            @RequestParam String password
-    ) {
-        boolean result = userService.createUser(firstName, lastName, country, city, login, password);
+    public String createUser(@ModelAttribute @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()){
+            logger.warn("Oops, error with validation");
+            return "unsuccessfully";
+        }
+        boolean result = userService.createUser(user);
         if (result) {
             return "successfully";
         }
@@ -51,24 +52,20 @@ public class UserController {
     }
 
     @PutMapping
-    public String updateUser(
-            @RequestParam String id,
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String country,
-            @RequestParam String city,
-            @RequestParam String login,
-            @RequestParam String password
-    ) {
-        boolean result = userService.updateUser(Integer.parseInt(id), firstName, lastName, country, city, login, password);
+    public String updateUser(@ModelAttribute @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()){
+            logger.warn("Oops, error with validation");
+            return "unsuccessfully";
+        }
+        boolean result = userService.updateUser(user);
         if (result) {
             return "successfully";
         }
         return "unsuccessfully";
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable int id) {
+    @DeleteMapping
+    public String deleteUser(@RequestParam int id) {
         if (userService.deleteUser(id)) {
             return "successfully";
         }

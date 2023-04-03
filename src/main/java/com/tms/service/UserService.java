@@ -35,7 +35,7 @@ public class UserService {
             user.setCreated(result.getTimestamp("created"));
             user.setChanged(result.getTimestamp("changed"));
             user.setDeleted(result.getBoolean("is_deleted"));
-            user.setRating(result.getDouble("rating"));
+            user.setRating(result.getInt("rating"));
         } catch (SQLException e) {
             System.out.println("Ooops! It's error..." + e);
         }
@@ -60,7 +60,7 @@ public class UserService {
                 user.setCreated(result.getTimestamp("created"));
                 user.setChanged(result.getTimestamp("changed"));
                 user.setDeleted(result.getBoolean("is_deleted"));
-                user.setRating(result.getDouble("rating"));
+                user.setRating(result.getInt("rating"));
                 allUsers.add(user);
             }
         } catch (SQLException e) {
@@ -69,17 +69,17 @@ public class UserService {
         return allUsers;
     }
 
-    public boolean createUser(String firstName, String lastName, String country, String city, String login, String password) {
+    public boolean createUser(User user) {
         int result = 0;
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO users_table (id, first_name, last_name, country, city, login, password, created, changed, is_deleted, rating)" +
                     "VALUES (DEFAULT,?, ?, ?, ?, ?, ?, ?, ?, DEFAULT, DEFAULT)");
-            statement.setString(1, firstName);
-            statement.setString(2, lastName);
-            statement.setString(3, country);
-            statement.setString(4, city);
-            statement.setString(5, login);
-            statement.setString(6, password);
+            statement.setString(1, user.getFirstName());
+            statement.setString(2, user.getLastName());
+            statement.setString(3, user.getCountry());
+            statement.setString(4, user.getCity());
+            statement.setString(5, user.getLogin());
+            statement.setString(6, user.getPassword());
             statement.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now())); // created
             statement.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now())); // changed
 
@@ -91,18 +91,18 @@ public class UserService {
     }
 
 
-    public boolean updateUser(int id, String firstName, String lastName, String country, String city, String login, String password) {
+    public boolean updateUser(User user) {
         int result = 0;
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
             PreparedStatement statement = connection.prepareStatement("UPDATE users_table SET first_name=?, last_name=?, country=?, city=?, login=?, password=?, changed=? WHERE id =?");
-            statement.setString(1, firstName);
-            statement.setString(2, lastName);
-            statement.setString(3, country);
-            statement.setString(4, city);
-            statement.setString(5, login);
-            statement.setString(6, password);
+            statement.setString(1, user.getFirstName());
+            statement.setString(2, user.getLastName());
+            statement.setString(3, user.getCountry());
+            statement.setString(4, user.getCity());
+            statement.setString(5, user.getLogin());
+            statement.setString(6, user.getPassword());
             statement.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now())); // changed
-            statement.setInt(8, id);
+            statement.setInt(8, user.getId());
 
             result = statement.executeUpdate();
         } catch (SQLException e) {
