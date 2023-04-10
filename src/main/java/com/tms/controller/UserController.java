@@ -17,12 +17,13 @@ import java.util.ArrayList;
 public class UserController {
 
     UserService userService;
-    private final Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
+
+    private final Logger logger = Logger.getLogger(this.getClass());
 
     @GetMapping("/{id}")
     public String getUserById(@PathVariable int id, Model model) {
