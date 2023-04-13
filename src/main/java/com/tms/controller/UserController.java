@@ -2,7 +2,8 @@ package com.tms.controller;
 
 import com.tms.domain.User;
 import com.tms.service.UserService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +24,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @GetMapping("/{id}")
     public String getUserById(@PathVariable int id, Model model) {

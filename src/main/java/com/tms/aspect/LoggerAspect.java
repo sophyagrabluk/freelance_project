@@ -1,9 +1,10 @@
 package com.tms.aspect;
 
-import org.apache.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
@@ -11,7 +12,7 @@ import java.time.LocalTime;
 @Aspect
 @Component
 public class LoggerAspect {
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Before("within (com.tms.*)")
     public void getLogBefore(JoinPoint joinPoint) {
