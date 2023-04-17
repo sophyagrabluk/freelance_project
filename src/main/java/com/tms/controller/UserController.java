@@ -36,8 +36,8 @@ public class UserController {
     @GetMapping
     public String getAllUsers(Model model) {
         ArrayList<User> users = userService.getAllUsers();
-        model.addAttribute("user", users);
-        return "singleUser";
+        model.addAttribute("users", users);
+        return "allUsers";
     }
 
     @PostMapping

@@ -20,7 +20,7 @@ public class FeedbackService {
     public ArrayList<Feedback> getAllFeedback(int toWhichUserId) {
         ArrayList<Feedback> feedbackList = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM feedback_table WHERE toWhichUserId=?");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM feedback_table WHERE to_which_service_id=?");
             statement.setInt(1, toWhichUserId);
             ResultSet result = statement.executeQuery();
 
@@ -30,8 +30,8 @@ public class FeedbackService {
                 feedback.setRating(result.getInt("rating"));
                 feedback.setComment(result.getString("comment"));
                 feedback.setCreated(result.getTimestamp("created"));
-                feedback.setToWhichUserId(result.getInt("toWhichUserId"));
-                feedback.setFromWhichUserId(result.getInt("fromWhichUserId"));
+                feedback.setToWhichUserId(result.getInt("to_which_service_id"));
+                feedback.setFromWhichUserId(result.getInt("from_which_user_id"));
                 feedbackList.add(feedback);
             }
         } catch (SQLException e) {

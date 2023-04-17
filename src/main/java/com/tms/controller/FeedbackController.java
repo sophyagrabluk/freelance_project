@@ -28,8 +28,8 @@ public class FeedbackController {
 
     @GetMapping("/{toWhichUserId}")
     public String getAllFeedbacksForService(@PathVariable int toWhichUserId, Model model) {
-        ArrayList<Feedback> feedback = feedbackService.getAllFeedback(toWhichUserId);
-        model.addAttribute("toWhichUserId", toWhichUserId);
+        ArrayList<Feedback> feedbacks = feedbackService.getAllFeedback(toWhichUserId);
+        model.addAttribute("feedbacks", feedbacks);
         return "allFeedbacksForUser";
     }
 

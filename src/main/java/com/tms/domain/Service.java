@@ -16,4 +16,6 @@ public class Service {
     String description;
     boolean isDeleted;
 
+    int userId;
+
 }

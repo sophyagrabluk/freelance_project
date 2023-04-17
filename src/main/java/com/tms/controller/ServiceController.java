@@ -35,8 +35,15 @@ public class ServiceController {
     @GetMapping
     public String getAllServices(Model model) {
         ArrayList<Service> services = serviceService.getAllServices();
-        model.addAttribute("user", services);
-        return "singleService";
+        model.addAttribute("services", services);
+        return "allServices";
+    }
+
+    @GetMapping("/forUser/{userId}")
+    public String getServiceFromOneUser(@PathVariable int userId, Model model) {
+        ArrayList<Service> services = serviceService.getServiceFromOneUser(userId);
+        model.addAttribute("servicesForUser", services);
+        return "allServices";
     }
 
     @PostMapping
