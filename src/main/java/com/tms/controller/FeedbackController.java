@@ -5,16 +5,20 @@ import com.tms.service.FeedbackService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
 
 
-@Controller
+@RestController
 @RequestMapping("/feedback")
 public class FeedbackController {
 
@@ -27,16 +31,16 @@ public class FeedbackController {
     }
 
     @GetMapping("/{toWhichUserId}")
-    public String getAllFeedbacksForService(@PathVariable int toWhichUserId, Model model) {
-        ArrayList<Feedback> feedbacks = feedbackService.getAllFeedback(toWhichUserId);
-        model.addAttribute("feedbacks", feedbacks);
-        return "allFeedbacksForUser";
+    public ArrayList<Feedback> getAllFeedbacksForService(@PathVariable int toWhichUserId) {
+        return feedbackService.getAllFeedback(toWhichUserId);
     }
 
     @PostMapping
-    public String createFeedback(@ModelAttribute @Valid Feedback feedback, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
-            logger.warn("Oops, error with validation");
+    public String createFeedback(@RequestBody @Valid Feedback feedback, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            for (ObjectError o : bindingResult.getAllErrors()) {
+                logger.warn("Oops, these are binding errors" + o);
+            }
             return "unsuccessfully";
         }
         boolean result = feedbackService.createFeedback(feedback);

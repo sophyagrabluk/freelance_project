@@ -12,10 +12,7 @@ public class Service {
     String name;
     @Pattern(regexp = "[A-z]*")
     String section;
-    int usersId;
     String description;
     boolean isDeleted;
-
     int userId;
-
 }
