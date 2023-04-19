@@ -1,90 +1,43 @@
 package com.tms.repository;
 
 import com.tms.domain.User;
+import com.tms.utils.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Repository
 public class UserRepository {
 
-    public User getUserById(int id) {
-        User user = new User();
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM users_table WHERE id=?");
-            statement.setInt(1, id);
-            ResultSet result = statement.executeQuery();
+    public JdbcTemplate template;
 
-            result.next();
-            user.setId(result.getInt("id"));
-            user.setFirstName(result.getString("first_name"));
-            user.setLastName(result.getString("last_name"));
-            user.setCountry(result.getString("country"));
-            user.setCity(result.getString("city"));
-            user.setLogin(result.getString("login"));
-            user.setPassword(result.getString("password"));
-            user.setCreated(result.getTimestamp("created"));
-            user.setChanged(result.getTimestamp("changed"));
-            user.setDeleted(result.getBoolean("is_deleted"));
-            user.setRating(result.getInt("rating"));
-        } catch (SQLException e) {
-            System.out.println("Ooops! It's error..." + e);
-        }
-        return user;
+    @Autowired
+    public UserRepository(DataSource dataSource) {
+        this.template = new JdbcTemplate(dataSource);
+    }
+
+    public User getUserById(int id) {
+        return template.queryForObject("SELECT * FROM users_table WHERE id=?", new UserMapper(), id);
     }
 
     public ArrayList<User> getAllUsers() {
-        ArrayList<User> allUsers =new ArrayList<>();
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM users_table");
-
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                User user = new User();
-                user.setId(result.getInt("id"));
-                user.setFirstName(result.getString("first_name"));
-                user.setLastName(result.getString("last_name"));
-                user.setCountry(result.getString("country"));
-                user.setCity(result.getString("city"));
-                user.setLogin(result.getString("login"));
-                user.setPassword(result.getString("password"));
-                user.setCreated(result.getTimestamp("created"));
-                user.setChanged(result.getTimestamp("changed"));
-                user.setDeleted(result.getBoolean("is_deleted"));
-                user.setRating(result.getInt("rating"));
-                allUsers.add(user);
-            }
-        } catch (SQLException e) {
-            System.out.println("Ooops! It's error..." + e);
-        }
-        return allUsers;
+        return (ArrayList<User>) template.query("SELECT * FROM users_table", new UserMapper());
     }
 
     public boolean createUser(User user) {
-        int result = 0;
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO users_table (id, first_name, last_name, country, city, login, password, created, changed, is_deleted, rating)" +
-                    "VALUES (DEFAULT,?, ?, ?, ?, ?, ?, ?, ?, DEFAULT, DEFAULT)");
-            statement.setString(1, user.getFirstName());
-            statement.setString(2, user.getLastName());
-            statement.setString(3, user.getCountry());
-            statement.setString(4, user.getCity());
-            statement.setString(5, user.getLogin());
-            statement.setString(6, user.getPassword());
-            statement.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now())); // created
-            statement.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now())); // changed
-
-            result = statement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Ooops! It's error..." + e);
-        }
+        int result = template.update("INSERT INTO users_table (id, first_name, last_name, country, city, login, password, created, changed, is_deleted, rating)" +
+                "VALUES (DEFAULT,?, ?, ?, ?, ?, ?, ?, ?, DEFAULT, DEFAULT)", new Object[]{user.getFirstName(), user.getLastName(),
+                user.getCountry(), user.getCity(), user.getLogin(), user.getPassword(), new Date((new java.util.Date()).getTime()), new Date((new java.util.Date()).getTime())});
         return result == 1;
     }
 
@@ -120,7 +73,7 @@ public class UserRepository {
         return result == 1;
     }
 
-    public boolean addServiceToUser (int userId, int serviceId){
+    public boolean addServiceToUser(int userId, int serviceId) {
         int result = 0;
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/freelance_db", "postgres", "root")) {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO l_users_services (id, user_id, service_id)" +
