@@ -1,7 +1,9 @@
 package com.tms.service;
 
-import com.tms.domain.Feedback;
+import com.tms.model.Feedback;
 import com.tms.repository.FeedbackRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,15 +11,9 @@ import java.util.ArrayList;
 
 @Service
 public class FeedbackService {
-//    {
-//        try {
-//            Class.forName("org.postgresql.Driver");
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     FeedbackRepository feedbackRepository;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public FeedbackService(FeedbackRepository feedbackRepository) {
@@ -29,6 +25,15 @@ public class FeedbackService {
     }
 
     public boolean createFeedback(Feedback feedback) {
-       return feedbackRepository.createFeedback(feedback);
+        try {
+            return feedbackRepository.createFeedback(feedback);
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean deleteFeedback(int id) {
+        return feedbackRepository.deleteFeedback(id);
     }
 }

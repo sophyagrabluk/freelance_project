@@ -1,10 +1,12 @@
 package com.tms.controller;
 
-import com.tms.domain.User;
+import com.tms.model.User;
 import com.tms.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,68 +27,67 @@ import java.util.ArrayList;
 public class UserController {
 
     UserService userService;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable int id) {
-        return userService.getUserById(id);
+    public ResponseEntity<User> getUserById(@PathVariable int id) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping
-    public ArrayList<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<ArrayList<User>> getAllUsers() {
+        ArrayList<User> allUsers = userService.getAllUsers();
+        if (allUsers.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
 
     @PostMapping
-    public String createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+    public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        boolean result = userService.createUser(user);
+        if (bindingResult.hasErrors() || !result) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
-            return "unsuccessfully";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        boolean result = userService.createUser(user);
-        if (result) {
-            return "successfully";
-        }
-        return "unsuccessfully";
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping
-    public String updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+    public ResponseEntity<HttpStatus> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        boolean result = userService.updateUser(user);
+        if (bindingResult.hasErrors() || !result) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
-            return "unsuccessfully";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        boolean result = userService.updateUser(user);
-        if (result) {
-            return "successfully";
-        }
-        return "unsuccessfully";
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping
-    public String deleteUser(@RequestParam int id) {
-        if (userService.deleteUser(id)) {
-            return "successfully";
-        }
-        return "unsuccessfully";
+    public ResponseEntity<HttpStatus> deleteUser(@RequestParam int id) {
+        userService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{userId}/{serviceId}")
-    public String addServiceToUser(@PathVariable int userId, @PathVariable int serviceId) {
+    public ResponseEntity<HttpStatus> addServiceToUser(@PathVariable int userId, @PathVariable int serviceId) {
         boolean result = userService.addServiceToUser(userId, serviceId);
         if (result) {
-            return "successfully";
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        return "unsuccessfully";
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 }

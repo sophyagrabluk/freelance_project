@@ -1,9 +1,8 @@
-package com.tms.domain;
+package com.tms.model;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
@@ -23,6 +22,4 @@ public class User {
     Timestamp created;
     Timestamp changed;
     boolean isDeleted;
-    @Max(5)
-    int rating;
 }

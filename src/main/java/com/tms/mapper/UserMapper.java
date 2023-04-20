@@ -1,6 +1,6 @@
-package com.tms.utils;
+package com.tms.mapper;
 
-import com.tms.domain.User;
+import com.tms.model.User;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,6 @@ public class UserMapper implements RowMapper<User> {
         user.setCreated(result.getTimestamp("created"));
         user.setChanged(result.getTimestamp("changed"));
         user.setDeleted(result.getBoolean("is_deleted"));
-        user.setRating(result.getInt("rating"));
         return user;
     }
 }

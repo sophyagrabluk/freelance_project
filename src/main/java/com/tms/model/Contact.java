@@ -1,4 +1,4 @@
-package com.tms.domain;
+package com.tms.model;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;
@@ -10,5 +10,4 @@ public class Contact {
     String email;
     String phoneNumber;
     String telegram;
-
 }

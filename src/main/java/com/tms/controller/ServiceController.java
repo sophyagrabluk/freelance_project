@@ -1,10 +1,12 @@
 package com.tms.controller;
 
-import com.tms.domain.Service;
+import com.tms.model.Service;
 import com.tms.service.ServiceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,13 +35,21 @@ public class ServiceController {
     }
 
     @GetMapping("/{id}")
-    public Service getServiceById(@PathVariable int id) {
-        return serviceService.getServiceById(id);
+    public ResponseEntity<Service> getServiceById(@PathVariable int id) {
+        Service service = serviceService.getServiceById(id);
+        if (service == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(service, HttpStatus.OK);
     }
 
     @GetMapping
-    public ArrayList<Service> getAllServices() {
-        return serviceService.getAllServices();
+    public ResponseEntity<ArrayList<Service>> getAllServices() {
+        ArrayList<Service> allServices = serviceService.getAllServices();
+        if (allServices.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(allServices, HttpStatus.OK);
     }
 
     @GetMapping("/forUser/{userId}")
@@ -47,34 +57,37 @@ public class ServiceController {
         return serviceService.getServiceFromOneUser(userId);
     }
 
+    @GetMapping("/section/{section}")
+    public ResponseEntity<ArrayList<Service>> getServicesFromOneSection(@PathVariable String section) {
+        ArrayList<Service> allServicesFromOneSection = serviceService.getServicesFromOneSection(section);
+        if (allServicesFromOneSection.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping
-    public String createService(@RequestBody @Valid Service service, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+    public ResponseEntity<HttpStatus> createService(@RequestBody @Valid Service service, BindingResult bindingResult) {
+        boolean result = serviceService.createService(service);
+        if (bindingResult.hasErrors() || !result) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
-            return "unsuccessfully";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        boolean result = serviceService.createService(service);
-        if (result) {
-            return "successfully";
-        }
-        return "unsuccessfully";
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping
-    public String updateService(@RequestBody @Valid Service service, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+    public ResponseEntity<HttpStatus> updateService(@RequestBody @Valid Service service, BindingResult bindingResult) {
+        boolean result = serviceService.updateService(service);
+        if (bindingResult.hasErrors() || !result) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
-            return "unsuccessfully";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        boolean result = serviceService.updateService(service);
-        if (result) {
-            return "successfully";
-        }
-        return "unsuccessfully";
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping

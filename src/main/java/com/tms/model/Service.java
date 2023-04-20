@@ -1,8 +1,9 @@
-package com.tms.domain;
+package com.tms.model;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
 
 @Component
@@ -15,4 +16,6 @@ public class Service {
     String description;
     boolean isDeleted;
     int userId;
+    @Max(5)
+    int rating;
 }

@@ -1,0 +1,21 @@
+<html xmlns:th="http://www.thymeleaf.org"><html>
+<head>
+    <title>All users!!!</title>
+</head>
+<body>
+<h1> These are all users!</h1>
+<ul th:each="user : ${users}">
+  <div  th:object="${user}">
+    <h2> User id: [[*{id}]] </h2>
+    <h2> User first name: [[*{firstName}]] </h2>
+    <h2> User last name: [[*{lastName}]] </h2>
+    <h2> User country: [[*{country}]] </h2>
+    <h2> User city: [[*{city}]] </h2>
+    <h2> User rating: [[*{rating}]] </h2>
+    <h2> User login: [[*{login}]] </h2>
+    <h2> User password: [[*{password}]] </h2>
+    <h2> User created: [[*{created}]] </h2>
+  </div>
+</ul>
+</body>
+</html>

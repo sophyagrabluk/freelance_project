@@ -1,17 +1,21 @@
 package com.tms.controller;
 
-import com.tms.domain.Feedback;
+import com.tms.model.Feedback;
 import com.tms.service.FeedbackService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -31,22 +35,29 @@ public class FeedbackController {
     }
 
     @GetMapping("/{toWhichUserId}")
-    public ArrayList<Feedback> getAllFeedbacksForService(@PathVariable int toWhichUserId) {
-        return feedbackService.getAllFeedback(toWhichUserId);
+    public ResponseEntity<ArrayList<Feedback>> getAllFeedbacksForService(@PathVariable int toWhichUserId) {
+        ArrayList<Feedback> allFeedbacks = feedbackService.getAllFeedback(toWhichUserId);
+        if (allFeedbacks.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping
-    public String createFeedback(@RequestBody @Valid Feedback feedback, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+    public ResponseEntity<HttpStatus> createFeedback(@RequestBody @Valid Feedback feedback, BindingResult bindingResult) {
+        boolean result = feedbackService.createFeedback(feedback);
+        if (bindingResult.hasErrors() || !result) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
-            return "unsuccessfully";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        boolean result = feedbackService.createFeedback(feedback);
-        if (result) {
-            return "successfully";
-        }
-        return "unsuccessfully";
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<HttpStatus> deleteFeedback(@RequestParam int id) {
+        feedbackService.deleteFeedback(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
