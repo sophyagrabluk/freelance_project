@@ -1,55 +1,100 @@
 package com.tms.repository;
 
-import com.tms.mapper.UserMapper;
 import com.tms.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 
 @Repository
 public class UserRepository {
 
-    public JdbcTemplate template;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final SessionFactory sessionFactory;
 
-    @Autowired
-    public UserRepository(DataSource dataSource) {
-        this.template = new JdbcTemplate(dataSource);
+    public UserRepository() {
+        this.sessionFactory = new Configuration().configure().buildSessionFactory();
     }
 
     public User getUserById(int id) {
-        return template.queryForObject("SELECT * FROM users_table WHERE id=?", new UserMapper(), id);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        User user = session.get(User.class, id);
+
+        session.getTransaction().commit();
+        session.close();
+        if (user != null) {
+            return user;
+        }
+        return new User();
     }
 
     public ArrayList<User> getAllUsers() {
-        return (ArrayList<User>) template.query("SELECT * FROM users_table", new UserMapper());
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("from User");
+        ArrayList<User> list = (ArrayList<User>) query.getResultList();
+        session.getTransaction().commit();
+        session.close();
+        return list;
     }
 
     public boolean createUser(User user) {
-        int result = template.update("INSERT INTO users_table (id, first_name, last_name, country, city, login, password, created, changed, is_deleted)" +
-                "VALUES (DEFAULT,?, ?, ?, ?, ?, ?, ?, ?, DEFAULT)", new Object[]{user.getFirstName(), user.getLastName(),
-                user.getCountry(), user.getCity(), user.getLogin(), user.getPassword(), new Date((new java.util.Date()).getTime()), new Date((new java.util.Date()).getTime())});
-        return result == 1;
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            user.setCreated(new Date(System.currentTimeMillis()));
+            user.setChanged(new Date(System.currentTimeMillis()));
+            session.save(user);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean updateUser(User user) {
-        int result = template.update("UPDATE users_table SET first_name=?, last_name=?, country=?, city=?, login=?, password=?, changed=? WHERE id =?",
-                new Object[]{user.getFirstName(), user.getLastName(), user.getCountry(), user.getCity(),
-                        user.getLogin(), user.getPassword(), new Date((new java.util.Date()).getTime()), user.getId()});
-        return result == 1;
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            user.setChanged(new Date(System.currentTimeMillis()));
+            session.saveOrUpdate(user);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean deleteUser(int id) {
-        int result = template.update("UPDATE users_table SET is_deleted = TRUE WHERE id =?", id);
-        return result == 1;
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            User user = session.get(User.class, id);
+            user.setDeleted(true);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+        }
+        return false;
     }
 
-    public boolean addServiceToUser(int userId, int serviceId) {
-        int result = template.update("INSERT INTO l_users_services (id, user_id, service_id) VALUES (DEFAULT,?, ?)",
-                new Object[]{userId, serviceId});
-        return result == 1;
+    public boolean addServiceToUser(int userId, int serviceId) { //TODO: do using Query Hibernate
+        return true;
+//        int result = template.update("INSERT INTO l_users_services (id, user_id, service_id) VALUES (DEFAULT,?, ?)",
+//                new Object[]{userId, serviceId});
+//        return result == 1;
     }
 }

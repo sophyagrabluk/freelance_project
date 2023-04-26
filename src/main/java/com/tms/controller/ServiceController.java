@@ -91,10 +91,8 @@ public class ServiceController {
     }
 
     @DeleteMapping
-    public String deleteService(@RequestParam int id) {
-        if (serviceService.deleteService(id)) {
-            return "successfully";
-        }
-        return "unsuccessfully";
+    public ResponseEntity<Service> deleteService(@RequestParam int id) {
+        serviceService.deleteService(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
