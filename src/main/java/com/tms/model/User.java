@@ -12,7 +12,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Component
 @Data
@@ -37,10 +37,10 @@ public class User {
     String login;
     @Column(name = "password")
     String password;
-    @Column(name = "created")
-    Date created;
+    @Column(name = "created", updatable = false)
+    Timestamp created;
     @Column(name = "changed")
-    Date changed;
+    Timestamp changed;
     @Column(name = "is_deleted")
     boolean isDeleted;
 }

@@ -1,58 +1,106 @@
 package com.tms.repository;
 
 import com.tms.model.Service;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 
 @Repository
 public class ServiceRepository {
 
-    JdbcTemplate template;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final SessionFactory sessionFactory;
 
-    public ServiceRepository(DataSource dataSource) {
-        this.template = new JdbcTemplate(dataSource);
+    public ServiceRepository() {
+        this.sessionFactory = new Configuration().configure().buildSessionFactory();
     }
 
     public com.tms.model.Service getServiceById(int id) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Service service = session.get(Service.class, id);
+        session.getTransaction().commit();
+        session.close();
+        if (service != null) {
+            return service;
+        }
         return new Service();
-        //return template.queryForObject("SELECT * FROM services_table WHERE id=?", new ServiceMapper(), id);
     }
 
     public ArrayList<Service> getAllServices() {
-        return new ArrayList<>();
-        //return (ArrayList<Service>) template.query("SELECT * FROM services_table", new ServiceMapper());
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("from Service where isDeleted = false");
+        ArrayList<Service> list = (ArrayList<Service>) query.getResultList();
+        session.getTransaction().commit();
+        session.close();
+        return list;
     }
 
     public ArrayList<com.tms.model.Service> getServiceFromOneUser(int userId) {
-        return new ArrayList<>();
-        //return (ArrayList<Service>)template.query("SELECT * FROM services_table WHERE user_id=?", new ServiceMapper(), userId);
-    }
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Query query = session.createNativeQuery("SELECT s.id, s.name, s.section, s.description, s.rating, s.user_id FROM services_table AS s WHERE user_id = :userId AND is_deleted = FALSE");
+        query.setParameter("userId", userId);
+        session.getTransaction().commit();
+        return (ArrayList<Service>) query.getResultList();
+   }
 
     public ArrayList<com.tms.model.Service> getServicesFromOneSection(String section) {
-        return new ArrayList<>();
-        //return (ArrayList<Service>)template.query("SELECT * FROM services_table WHERE section=?", new ServiceMapper(), section);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Query query = session.createNativeQuery("SELECT s.id, s.name, s.section, s.description, s.rating, s.user_id FROM services_table AS s WHERE section = :section AND is_deleted = FALSE");
+        query.setParameter("section", section);
+        session.getTransaction().commit();
+        return (ArrayList<Service>) query.getResultList();
     }
 
     public boolean createService(com.tms.model.Service service) {
-        return true;
-//        int result = template.update("INSERT INTO services_table (id, name, section, description, is_deleted, user_id)" +
-//                "VALUES (DEFAULT,?, ?, ?, DEFAULT, ?)", new Object[]{service.getName(), service.getSection(),service.getDescription(), service.getUserId()});
-//        return result == 1;
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            session.save(service);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean updateService(com.tms.model.Service service) {
-        return true;
-//        int result = template.update("UPDATE services_table SET name=?, section=?, description=? WHERE id =?",
-//                new Object[]{service.getName(), service.getSection(),service.getDescription(), service.getId()});
-//        return result == 1;
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            session.saveOrUpdate(service);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean deleteService(int id) {
-        return true;
-//        int result = template.update("UPDATE  services_table SET is_deleted = TRUE WHERE id =?", id);
-//        return result == 1;
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            Service service = session.get(Service.class, id);
+            service.setDeleted(true);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+        }
+        return false;
     }
 }

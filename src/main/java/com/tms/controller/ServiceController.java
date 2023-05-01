@@ -63,7 +63,7 @@ public class ServiceController {
         if (allServicesFromOneSection.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(allServicesFromOneSection, HttpStatus.OK);
     }
 
     @PostMapping

@@ -33,4 +33,7 @@ public class Feedback {
     private int toWhichUserId;
     @Column(name = "from_which_user_id")
     private int fromWhichUserId;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
 }

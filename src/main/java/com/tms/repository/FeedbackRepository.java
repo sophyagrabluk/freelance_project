@@ -1,42 +1,65 @@
 package com.tms.repository;
 
 import com.tms.model.Feedback;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Repository
 public class FeedbackRepository {
 
-    JdbcTemplate template;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private  final SessionFactory sessionFactory;
 
-    public FeedbackRepository(DataSource dataSource) {
-        this.template = new JdbcTemplate(dataSource);
+    public FeedbackRepository() {
+        this.sessionFactory = new Configuration().configure().buildSessionFactory();
     }
 
+
     public ArrayList<Feedback> getAllFeedback(int toWhichUserId) {
-        return new ArrayList<>();
-        //return (ArrayList<Feedback>) template.query("SELECT * FROM feedback_table WHERE to_which_service_id=?", new FeedbackMapper(), toWhichUserId);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("from Feedback");
+        ArrayList<Feedback> list = (ArrayList<Feedback>) query.getResultList();
+        session.getTransaction().commit();
+        session.close();
+        return list;
     }
 
     public boolean createFeedback(Feedback feedback) {
-        return true;
-//        int result = template.update("INSERT INTO feedback_table (id, rating, comment, created, to_which_service_id, from_which_user_id)" +
-//                "VALUES (DEFAULT,?, ?, ?, ?, ?)", new Object[]{feedback.getRating(), feedback.getComment(),
-//                new Date((new java.util.Date()).getTime()), feedback.getToWhichUserId(), feedback.getFromWhichUserId()});
-//        return result == 1;
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            feedback.setCreated(new Timestamp(System.currentTimeMillis()));
+            session.save(feedback);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean deleteFeedback(int id) {
-        return true;
-//        int result = template.update("UPDATE  feedback_table SET is_deleted = TRUE WHERE id =?");
-//        return result == 1;
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            Feedback feedback = session.get(Feedback.class, id);
+            feedback.setDeleted(true);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+        }
+        return false;
     }
-
-//    public void updateRatingInServiceTable (int mark){
-//        int result1 = template.update("SELECT rating FROM feedback_table WHERE to_which_service_id = ?");
-//        int result2 = template.update("UPDATE services_table SET rating = ?");
-//    }
 }

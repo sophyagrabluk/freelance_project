@@ -40,7 +40,7 @@ public class FeedbackController {
         if (allFeedbacks.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(allFeedbacks, HttpStatus.OK);
     }
 
     @PostMapping
