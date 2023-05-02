@@ -24,24 +24,18 @@ public class UserRepository {
 
     public User getUserById(int id) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        Query query = session.createNativeQuery("SELECT * FROM users_table WHERE id = :id AND is_deleted=false");
-        query.setParameter("id",id);
-        User user = (User) query.getSingleResult();
-        //User user = session.get(User.class, id);
-        session.getTransaction().commit();
-        if (user != null) {
+        User user = session.get(User.class, id);
+        session.close();
+        if (user != null && !user.isDeleted()) {
             return user;
         }
-        return new User();
+        return null;
     }
 
     public ArrayList<User> getAllUsers() {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
         Query query = session.createQuery("from User where isDeleted = false");
         ArrayList<User> list = (ArrayList<User>) query.getResultList();
-        session.getTransaction().commit();
         session.close();
         return list;
     }

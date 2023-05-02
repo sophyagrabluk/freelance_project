@@ -25,10 +25,8 @@ public class FeedbackRepository {
 
     public ArrayList<Feedback> getAllFeedback(int toWhichUserId) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
         Query query = session.createQuery("from Feedback");
         ArrayList<Feedback> list = (ArrayList<Feedback>) query.getResultList();
-        session.getTransaction().commit();
         session.close();
         return list;
     }

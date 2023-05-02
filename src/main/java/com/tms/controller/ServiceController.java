@@ -52,9 +52,13 @@ public class ServiceController {
         return new ResponseEntity<>(allServices, HttpStatus.OK);
     }
 
-    @GetMapping("/forUser/{userId}")
-    public ArrayList<Service> getServiceFromOneUser(@PathVariable int userId) {
-        return serviceService.getServiceFromOneUser(userId);
+    @GetMapping("/fromUser/{userId}")
+    public ResponseEntity<ArrayList<Service>> getServiceFromOneUser(@PathVariable int userId) {
+        ArrayList<Service> allServicesFromOneUser =  serviceService.getServiceFromOneUser(userId);
+        if (allServicesFromOneUser.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(allServicesFromOneUser, HttpStatus.OK);
     }
 
     @GetMapping("/section/{section}")

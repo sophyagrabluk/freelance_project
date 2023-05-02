@@ -23,41 +23,35 @@ public class ServiceRepository {
 
     public com.tms.model.Service getServiceById(int id) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
         Service service = session.get(Service.class, id);
-        session.getTransaction().commit();
         session.close();
-        if (service != null) {
+        if (service != null && !service.isDeleted()) {
             return service;
         }
-        return new Service();
+        return null;
     }
 
     public ArrayList<Service> getAllServices() {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
         Query query = session.createQuery("from Service where isDeleted = false");
         ArrayList<Service> list = (ArrayList<Service>) query.getResultList();
-        session.getTransaction().commit();
         session.close();
         return list;
     }
 
     public ArrayList<com.tms.model.Service> getServiceFromOneUser(int userId) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
         Query query = session.createNativeQuery("SELECT s.id, s.name, s.section, s.description, s.rating, s.user_id FROM services_table AS s WHERE user_id = :userId AND is_deleted = FALSE");
         query.setParameter("userId", userId);
-        session.getTransaction().commit();
+        session.close();
         return (ArrayList<Service>) query.getResultList();
    }
 
     public ArrayList<com.tms.model.Service> getServicesFromOneSection(String section) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
         Query query = session.createNativeQuery("SELECT s.id, s.name, s.section, s.description, s.rating, s.user_id FROM services_table AS s WHERE section = :section AND is_deleted = FALSE");
         query.setParameter("section", section);
-        session.getTransaction().commit();
+        session.close();
         return (ArrayList<Service>) query.getResultList();
     }
 
