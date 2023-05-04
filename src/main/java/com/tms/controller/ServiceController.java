@@ -53,8 +53,8 @@ public class ServiceController {
     }
 
     @GetMapping("/fromUser/{userId}")
-    public ResponseEntity<ArrayList<Service>> getServiceFromOneUser(@PathVariable int userId) {
-        ArrayList<Service> allServicesFromOneUser =  serviceService.getServiceFromOneUser(userId);
+    public ResponseEntity<ArrayList<Service>> findServiceByUserId(@PathVariable int userId) {
+        ArrayList<Service> allServicesFromOneUser = serviceService.findServiceByUserId(userId);
         if (allServicesFromOneUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -62,8 +62,8 @@ public class ServiceController {
     }
 
     @GetMapping("/section/{section}")
-    public ResponseEntity<ArrayList<Service>> getServicesFromOneSection(@PathVariable String section) {
-        ArrayList<Service> allServicesFromOneSection = serviceService.getServicesFromOneSection(section);
+    public ResponseEntity<ArrayList<Service>> findServiceBySection(@PathVariable String section) {
+        ArrayList<Service> allServicesFromOneSection = serviceService.findServiceBySection(section);
         if (allServicesFromOneSection.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -72,8 +72,8 @@ public class ServiceController {
 
     @PostMapping
     public ResponseEntity<HttpStatus> createService(@RequestBody @Valid Service service, BindingResult bindingResult) {
-        boolean result = serviceService.createService(service);
-        if (bindingResult.hasErrors() || !result) {
+        Service resultService = serviceService.createService(service);
+        if (bindingResult.hasErrors() || resultService == null) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
@@ -84,8 +84,8 @@ public class ServiceController {
 
     @PutMapping
     public ResponseEntity<HttpStatus> updateService(@RequestBody @Valid Service service, BindingResult bindingResult) {
-        boolean result = serviceService.updateService(service);
-        if (bindingResult.hasErrors() || !result) {
+        Service resultService = serviceService.updateService(service);
+        if (bindingResult.hasErrors() || resultService == null) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }

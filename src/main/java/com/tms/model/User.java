@@ -22,25 +22,34 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq_gen")
     @SequenceGenerator(name = "user_id_seq_gen", sequenceName = "users_table_id_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
+
     @Column(name = "first_name")
     private String firstName;
+
     @Column(name = "last_name")
     private String lastName;
+
     @Column(name = "country")
     private String country;
+
     @Column(name = "city")
     private String city;
+
     @Size(min = 5, max = 30)
     @Pattern(regexp = "[a-z0-9]*")
     @Column(name = "login")
     private String login;
+
     @Column(name = "password")
     private String password;
+
     @Column(name = "created", updatable = false)
     private Timestamp created;
+
     @Column(name = "changed")
     private Timestamp changed;
+
     @Column(name = "is_deleted")
     private boolean isDeleted;
 }

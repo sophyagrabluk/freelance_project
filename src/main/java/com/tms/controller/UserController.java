@@ -53,9 +53,9 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        boolean result = userService.createUser(user);
-        if (bindingResult.hasErrors() || !result) {
+    public ResponseEntity<User> createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        User userResult = userService.createUser(user);
+        if (bindingResult.hasErrors() || userResult == null) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
@@ -65,9 +65,9 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<HttpStatus> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        boolean result = userService.updateUser(user);
-        if (bindingResult.hasErrors() || !result) {
+    public ResponseEntity<User> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        User userResult = userService.updateUser(user);
+        if (bindingResult.hasErrors() || userResult == null) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
@@ -84,10 +84,18 @@ public class UserController {
 
     @PostMapping("/{userId}/{serviceId}")
     public ResponseEntity<HttpStatus> addServiceToUser(@PathVariable int userId, @PathVariable int serviceId) {
-        boolean result = userService.addServiceToUser(userId, serviceId);
-        if (result) {
+        try {
+            userService.addServiceToUser(userId, serviceId);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            logger.warn("There is exception: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
+//        boolean result = userService.addServiceToUser(userId, serviceId);
+//        if (result) {
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.CONFLICT);
+//    }
 }

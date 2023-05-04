@@ -5,10 +5,12 @@ import com.tms.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -23,45 +25,55 @@ public class UserService {
 
     public User getUserById(int id) {
         try {
-            return userRepository.getUserById(id);
-        } catch (EmptyResultDataAccessException e) {
+            Optional<User> user = userRepository.findById(id);
+            if (user.isPresent() && !user.get().isDeleted()) {
+                return user.orElse(null);
+            }
+            return null;
+        } catch (Exception e) {
             logger.warn("There is exception: " + e.getMessage());
             return null;
         }
     }
 
     public ArrayList<User> getAllUsers() {
-        return userRepository.getAllUsers();
+        return (ArrayList<User>) userRepository.findAll();
     }
 
-    public boolean createUser(User user) {
+    public User createUser(User user) {
         try {
-            return userRepository.createUser(user);
+            user.setCreated(new Timestamp(System.currentTimeMillis()));
+            user.setChanged(new Timestamp(System.currentTimeMillis()));
+            return userRepository.save(user);
         } catch (Exception e) {
             logger.warn("There is exception: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
-    public boolean updateUser(User user) {
+    public User updateUser(User user) {
         try {
-            return userRepository.updateUser(user);
+            user.setChanged(new Timestamp(System.currentTimeMillis()));
+            return userRepository.saveAndFlush(user);
         } catch (Exception e) {
             logger.warn("There is exception: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
-    public boolean deleteUser(int id) {
-        return userRepository.deleteUser(id);
+    @Transactional
+    public void deleteUser(int id) {
+        userRepository.deleteById(id);
     }
 
-    public boolean addServiceToUser(int userId, int serviceId) {
-        try {
-            return userRepository.addServiceToUser(userId, serviceId);
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return false;
-        }
+    @Transactional
+    public void addServiceToUser(int userId, int serviceId) {
+        userRepository.addServiceToUser(userId, serviceId);
+//        try {
+//            userRepository.addServiceToUser(userId, serviceId);
+//        } catch (Exception e) {
+//            logger.warn("There is exception: " + e.getMessage());
+//            return false;
+//        }
     }
 }

@@ -30,21 +30,28 @@ public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "service_id_seq_gen")
     @SequenceGenerator(name = "service_id_seq_gen", sequenceName = "services_table_id_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
+
     @Column(name = "name")
     private String name;
+
     @Pattern(regexp = "[A-z]*")
     @Column(name = "section")
     private String section;
+
     @Column(name = "description")
     private String description;
+
     @Column(name = "is_deleted")
     private boolean isDeleted;
+
     @Column(name = "user_id")
     private int userId;
+
     @Max(5)
     @Column(name = "rating")
     private int rating;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "service", fetch = FetchType.EAGER)
     private Set<Feedback> feedbackList = new LinkedHashSet<>();

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Service
@@ -21,19 +22,21 @@ public class FeedbackService {
     }
 
     public ArrayList<Feedback> getAllFeedback(int toWhichUserId) {
-       return feedbackRepository.getAllFeedback(toWhichUserId);
+        return new ArrayList<>();
+        //return feedbackRepository.getAllFeedback(toWhichUserId); //TODO: CHANGE TO JPA
     }
 
-    public boolean createFeedback(Feedback feedback) {
+    public Feedback createFeedback(Feedback feedback) {
         try {
-            return feedbackRepository.createFeedback(feedback);
+            feedback.setCreated(new Timestamp(System.currentTimeMillis()));
+            return feedbackRepository.save(feedback);
         } catch (Exception e) {
             logger.warn("There is exception: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
-    public boolean deleteFeedback(int id) {
-        return feedbackRepository.deleteFeedback(id);
+    public void deleteFeedback(int id) {
+        feedbackRepository.deleteById(id); //TODO: UPDATE
     }
 }

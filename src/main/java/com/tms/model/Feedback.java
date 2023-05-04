@@ -28,18 +28,21 @@ public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "feedback_id_seq_gen")
     @SequenceGenerator(name = "feedback_id_seq_gen", sequenceName = "feedback_table_id_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
+
     @Column(name = "comment")
     private String comment;
+
     @Max(5)
     @Column(name = "rating")
     private int rating;
+
     @Column(name = "created")
     private Timestamp created;
-    //@Column(name = "to_which_service_id")
-    //private int toWhichServiceId;
+
     @Column(name = "from_which_user_id")
     private int fromWhichUserId;
+
     @Column(name = "is_deleted")
     private boolean isDeleted;
 

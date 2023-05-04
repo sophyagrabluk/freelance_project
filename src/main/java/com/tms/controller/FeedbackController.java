@@ -44,9 +44,9 @@ public class FeedbackController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createFeedback(@RequestBody @Valid Feedback feedback, BindingResult bindingResult) {
-        boolean result = feedbackService.createFeedback(feedback);
-        if (bindingResult.hasErrors() || !result) {
+    public ResponseEntity<Feedback> createFeedback(@RequestBody @Valid Feedback feedback, BindingResult bindingResult) {
+        Feedback resultFeedback = feedbackService.createFeedback(feedback);
+        if (bindingResult.hasErrors() || resultFeedback == null) {
             for (ObjectError o : bindingResult.getAllErrors()) {
                 logger.warn("Oops, these are binding errors" + o);
             }
