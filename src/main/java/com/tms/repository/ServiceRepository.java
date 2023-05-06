@@ -17,7 +17,10 @@ public interface ServiceRepository extends JpaRepository<Service, Integer> {
     Optional<ArrayList<Service>> findServiceByUserId (Integer id);
 
     @Modifying
-    @Query(value = "UPDATE Service s SET s.isDeleted =true WHERE s.id = :id")
+    @Query(
+            nativeQuery = true,
+            value = "UPDATE services_table SET is_deleted = true WHERE id = :id",
+            countQuery = "SELECT * FROM services_table WHERE id = :id")
     void deleteService (int id);
 
 }

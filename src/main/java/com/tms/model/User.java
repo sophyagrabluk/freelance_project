@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
@@ -30,9 +31,6 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "country")
-    private String country;
-
     @Column(name = "city")
     private String city;
 
@@ -52,4 +50,8 @@ public class User {
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
+
+    @Email
+    @Column(name = "email")
+    private String email;
 }

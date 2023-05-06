@@ -42,6 +42,8 @@ public class Feedback {
 
     @Column(name = "from_which_user_id")
     private int fromWhichUserId;
+    @Column(name = "to_which_service_id", insertable = false,updatable = false)
+    public int toWhichServiceId;
 
     @Column(name = "is_deleted")
     private boolean isDeleted;

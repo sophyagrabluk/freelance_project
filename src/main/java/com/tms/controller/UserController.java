@@ -92,10 +92,4 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
-//        boolean result = userService.addServiceToUser(userId, serviceId);
-//        if (result) {
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.CONFLICT);
-//    }
 }

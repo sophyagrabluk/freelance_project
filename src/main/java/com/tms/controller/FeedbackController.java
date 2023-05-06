@@ -34,9 +34,9 @@ public class FeedbackController {
         this.feedbackService = feedbackService;
     }
 
-    @GetMapping("/{toWhichUserId}")
+    @GetMapping("/{toWhichServiceId}")
     public ResponseEntity<ArrayList<Feedback>> getAllFeedbacksForService(@PathVariable int toWhichUserId) {
-        ArrayList<Feedback> allFeedbacks = feedbackService.getAllFeedback(toWhichUserId);
+        ArrayList<Feedback> allFeedbacks = feedbackService.getAllFeedbacksForService(toWhichUserId);
         if (allFeedbacks.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -21,9 +22,12 @@ public class FeedbackService {
         this.feedbackRepository = feedbackRepository;
     }
 
-    public ArrayList<Feedback> getAllFeedback(int toWhichUserId) {
-        return new ArrayList<>();
-        //return feedbackRepository.getAllFeedback(toWhichUserId); //TODO: CHANGE TO JPA
+    public ArrayList<Feedback> getAllFeedbacksForService(int toWhichServiceId) {
+        try {
+            return feedbackRepository.findAllByToWhichServiceId(toWhichServiceId).orElse(new ArrayList<>());
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     public Feedback createFeedback(Feedback feedback) {
@@ -36,7 +40,8 @@ public class FeedbackService {
         }
     }
 
+    @Transactional
     public void deleteFeedback(int id) {
-        feedbackRepository.deleteById(id); //TODO: UPDATE
+        feedbackRepository.deleteFeedback(id);
     }
 }

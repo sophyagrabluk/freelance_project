@@ -63,17 +63,11 @@ public class UserService {
 
     @Transactional
     public void deleteUser(int id) {
-        userRepository.deleteById(id);
+        userRepository.deleteUser(id);
     }
 
     @Transactional
     public void addServiceToUser(int userId, int serviceId) {
         userRepository.addServiceToUser(userId, serviceId);
-//        try {
-//            userRepository.addServiceToUser(userId, serviceId);
-//        } catch (Exception e) {
-//            logger.warn("There is exception: " + e.getMessage());
-//            return false;
-//        }
     }
 }
