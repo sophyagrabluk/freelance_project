@@ -70,6 +70,15 @@ public class ServiceController {
         return new ResponseEntity<>(allServicesFromOneSection, HttpStatus.OK);
     }
 
+    @GetMapping("/sortByRating")
+    public ResponseEntity<ArrayList<Service>> getAllServicesFromHighestRating() {
+        ArrayList<Service> allServicesFromOneSection = serviceService.getAllServicesFromHighestRating();
+        if (allServicesFromOneSection.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(allServicesFromOneSection, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<HttpStatus> createService(@RequestBody @Valid Service service, BindingResult bindingResult) {
         Service resultService = serviceService.createService(service);

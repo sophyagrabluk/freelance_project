@@ -16,6 +16,8 @@ public interface ServiceRepository extends JpaRepository<Service, Integer> {
 
     Optional<ArrayList<Service>> findServiceByUserId (Integer id);
 
+    ArrayList<Service> findServicesByOrderByRatingDesc();
+
     @Modifying
     @Query(
             nativeQuery = true,

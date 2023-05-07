@@ -46,6 +46,10 @@ public class ServiceService {
         return serviceRepository.findServiceBySection(section).orElse(new ArrayList<>());
     }
 
+    public ArrayList<com.tms.model.Service> getAllServicesFromHighestRating() {
+        return serviceRepository.findServicesByOrderByRatingDesc();
+    }
+
     public com.tms.model.Service createService(com.tms.model.Service service) {
         try {
             return serviceRepository.save(service);

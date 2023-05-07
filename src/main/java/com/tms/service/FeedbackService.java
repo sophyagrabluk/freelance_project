@@ -24,7 +24,7 @@ public class FeedbackService {
 
     public ArrayList<Feedback> getAllFeedbacksForService(int toWhichServiceId) {
         try {
-            return feedbackRepository.findAllByToWhichServiceId(toWhichServiceId).orElse(new ArrayList<>());
+            return feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(toWhichServiceId).orElse(new ArrayList<>());
         } catch (Exception e) {
             return new ArrayList<>();
         }

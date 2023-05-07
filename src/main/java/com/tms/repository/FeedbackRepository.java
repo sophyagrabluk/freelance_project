@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
 
-    Optional<ArrayList<Feedback>> findAllByToWhichServiceId(int toWhichUserId);
+    Optional<ArrayList<Feedback>> findAllByToWhichServiceIdOrderByCreatedDesc(int toWhichUserId);
 
     @Modifying
     @Query(
