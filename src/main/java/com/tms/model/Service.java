@@ -1,6 +1,5 @@
 package com.tms.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.tms.utils.SectionType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,16 +10,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Component
 @Data
@@ -53,8 +48,4 @@ public class Service {
     @Max(5)
     @Column(name = "rating")
     private int rating;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "service", fetch = FetchType.EAGER)
-    private Set<Feedback> feedbackList = new LinkedHashSet<>();
 }

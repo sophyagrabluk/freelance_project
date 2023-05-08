@@ -30,9 +30,11 @@ public class FeedbackService {
         }
     }
 
+    @Transactional
     public Feedback createFeedback(Feedback feedback) {
         try {
             feedback.setCreated(new Timestamp(System.currentTimeMillis()));
+            feedbackRepository.updateRating(feedback.getToWhichServiceId());
             return feedbackRepository.save(feedback);
         } catch (Exception e) {
             logger.warn("There is exception: " + e.getMessage());

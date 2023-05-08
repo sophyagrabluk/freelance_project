@@ -1,6 +1,5 @@
 package com.tms.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,8 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
@@ -42,14 +39,10 @@ public class Feedback {
 
     @Column(name = "from_which_user_id")
     private int fromWhichUserId;
-    @Column(name = "to_which_service_id", insertable = false,updatable = false)
-    public int toWhichServiceId;
+
+    @Column(name = "to_which_service_id")
+    private int toWhichServiceId;
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
-
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "to_which_service_id", nullable = false)
-    private Service service;
 }
