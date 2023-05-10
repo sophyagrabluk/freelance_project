@@ -6,13 +6,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
-    Optional<ArrayList<Order>> findAllByUserId(Integer userId);
+    List<Order> findAllByUserId(Integer userId);
 
     @Modifying
     @Query(

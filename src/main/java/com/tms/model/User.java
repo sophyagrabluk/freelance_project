@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
@@ -35,7 +34,6 @@ public class User {
     private String city;
 
     @Size(min = 5, max = 30)
-    @Pattern(regexp = "[a-z0-9]*")
     @Column(name = "login")
     private String login;
 

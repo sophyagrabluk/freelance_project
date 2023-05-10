@@ -1,20 +1,22 @@
 package com.tms.service;
 
+import com.tms.exception.BadRequestException;
+import com.tms.exception.NotFoundException;
 import com.tms.repository.ServiceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
+import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ServiceService {
 
     ServiceRepository serviceRepository;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public ServiceService(ServiceRepository serviceRepository) {
@@ -22,49 +24,65 @@ public class ServiceService {
     }
 
     public com.tms.model.Service getServiceById(int id) {
-        try {
-            Optional<com.tms.model.Service> service = serviceRepository.findById(id);
-            if (service.isPresent() && !service.get().isDeleted()) {
-                return service.orElse(null);
-            }
-            return null;
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return null;
+        Optional<com.tms.model.Service> service = serviceRepository.findById(id);
+        if (service.isPresent() && !service.get().isDeleted()) {
+            return service.orElse(null);
+        } else {
+            throw new NotFoundException("There is no such service");
         }
     }
 
-    public ArrayList<com.tms.model.Service> getAllServices() {
-        return (ArrayList<com.tms.model.Service>) serviceRepository.findAll();
-    }
-
-    public ArrayList<com.tms.model.Service> findServiceByUserId(int userId) {
-        return serviceRepository.findServiceByUserId(userId).orElse(new ArrayList<>());
-    }
-
-    public ArrayList<com.tms.model.Service> findServiceBySection(String section) {
-        return serviceRepository.findServiceBySection(section).orElse(new ArrayList<>());
-    }
-
-    public ArrayList<com.tms.model.Service> getAllServicesFromHighestRating() {
-        return serviceRepository.findServicesByOrderByRatingDesc();
-    }
-
-    public com.tms.model.Service createService(com.tms.model.Service service) {
-        try {
-            return serviceRepository.save(service);
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return null;
+    public List<com.tms.model.Service> getAllServices() {
+        List<com.tms.model.Service> services = serviceRepository.findAll();
+        if (!services.isEmpty()) {
+            return services.stream().filter(service -> !service.isDeleted()).collect(Collectors.toList());
+        } else {
+            throw new NotFoundException("There are no services");
         }
     }
 
-    public com.tms.model.Service updateService(com.tms.model.Service service) {
-        try {
-            return serviceRepository.saveAndFlush(service);
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return null;
+    public List<com.tms.model.Service> findServiceByUserId(int userId) {
+        List<com.tms.model.Service> services = serviceRepository.findServiceByUserId(userId);
+        if (!services.isEmpty()){
+            return services.stream().filter(service -> !service.isDeleted()).collect(Collectors.toList());
+        } else {
+            throw new NotFoundException("There are no services from this user");
+        }
+    }
+
+    public List<com.tms.model.Service> findServiceBySection(String section) {
+        List<com.tms.model.Service> services = serviceRepository.findServicesBySectionOrderByRatingDesc(section);
+        if (!services.isEmpty()){
+            return services.stream().filter(service -> !service.isDeleted()).collect(Collectors.toList());
+        } else {
+            throw new NotFoundException("There are no services from this section");
+        }
+    }
+
+    public List<com.tms.model.Service> getAllServicesFromHighestRating() {
+        List<com.tms.model.Service> services = serviceRepository.findServicesByOrderByRatingDesc();
+        if (!services.isEmpty()){
+            return services.stream().filter(service -> !service.isDeleted()).collect(Collectors.toList());
+        } else {
+            throw new NotFoundException("There are no services");
+        }
+    }
+
+    public com.tms.model.Service createService(@Valid com.tms.model.Service service, BindingResult bindingResult) {
+        com.tms.model.Service newService = serviceRepository.save(service);
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Check your info and try again");
+        } else {
+            return newService;
+        }
+    }
+
+    public com.tms.model.Service updateService(@Valid com.tms.model.Service service, BindingResult bindingResult) {
+        com.tms.model.Service updateService = serviceRepository.saveAndFlush(service);
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Check your info and try again");
+        } else {
+            return updateService;
         }
     }
 

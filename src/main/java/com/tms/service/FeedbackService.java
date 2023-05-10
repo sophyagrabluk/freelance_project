@@ -1,44 +1,47 @@
 package com.tms.service;
 
+import com.tms.exception.BadRequestException;
+import com.tms.exception.NotFoundException;
 import com.tms.model.Feedback;
 import com.tms.repository.FeedbackRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FeedbackService {
 
     FeedbackRepository feedbackRepository;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public FeedbackService(FeedbackRepository feedbackRepository) {
         this.feedbackRepository = feedbackRepository;
     }
 
-    public ArrayList<Feedback> getAllFeedbacksForService(int toWhichServiceId) {
-        try {
-            return feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(toWhichServiceId).orElse(new ArrayList<>());
-        } catch (Exception e) {
-            return new ArrayList<>();
+    public List<Feedback> getAllFeedbacksForService(int toWhichServiceId) {
+        List<Feedback> feedbacks = feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(toWhichServiceId);
+        if (!feedbacks.isEmpty()) {
+            return feedbacks.stream().filter(feedback -> !feedback.isDeleted()).collect(Collectors.toList());
+        } else {
+            throw new NotFoundException("There are no feedbacks for this service");
         }
     }
 
     @Transactional
-    public Feedback createFeedback(Feedback feedback) {
-        try {
-            feedback.setCreated(new Timestamp(System.currentTimeMillis()));
-            feedbackRepository.updateRating(feedback.getToWhichServiceId());
-            return feedbackRepository.save(feedback);
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return null;
+    public Feedback createFeedback(@Valid Feedback feedback, BindingResult bindingResult) {
+        feedback.setCreated(new Timestamp(System.currentTimeMillis()));
+        Feedback newFeedback = feedbackRepository.save(feedback);
+        feedbackRepository.updateRating(feedback.getToWhichServiceId());
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Check your info and try again");
+        } else {
+            return newFeedback;
         }
     }
 

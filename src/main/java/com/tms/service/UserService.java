@@ -1,22 +1,24 @@
 package com.tms.service;
 
+import com.tms.exception.BadRequestException;
+import com.tms.exception.NotFoundException;
 import com.tms.model.User;
 import com.tms.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     UserRepository userRepository;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -24,40 +26,42 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        try {
-            Optional<User> user = userRepository.findById(id);
-            if (user.isPresent() && !user.get().isDeleted()) {
-                return user.orElse(null);
-            }
-            return null;
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return null;
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent() && !user.get().isDeleted()) {
+            return user.orElse(null);
+        } else {
+            throw new NotFoundException("There is no such user");
         }
     }
 
-    public ArrayList<User> getAllUsers() {
-        return (ArrayList<User>) userRepository.findAll();
-    }
-
-    public User createUser(User user) {
-        try {
-            user.setCreated(new Timestamp(System.currentTimeMillis()));
-            user.setChanged(new Timestamp(System.currentTimeMillis()));
-            return userRepository.save(user);
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return null;
+    public List<User> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        if (!users.isEmpty()) {
+            return users.stream().filter(user -> !user.isDeleted()).collect(Collectors.toList());
+        } else {
+            throw new NotFoundException("There are no users");
         }
     }
 
-    public User updateUser(User user) {
-        try {
-            user.setChanged(new Timestamp(System.currentTimeMillis()));
-            return userRepository.saveAndFlush(user);
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return null;
+    public User createUser(@Valid User user, BindingResult bindingResult) {
+        user.setCreated(new Timestamp(System.currentTimeMillis()));
+        user.setChanged(new Timestamp(System.currentTimeMillis()));
+        User newUser = userRepository.save(user);
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Check your info and try again");
+        } else {
+            return newUser;
+        }
+    }
+
+
+    public User updateUser(@Valid User user, BindingResult bindingResult) {
+        user.setChanged(new Timestamp(System.currentTimeMillis()));
+        User updateUser = userRepository.saveAndFlush(user);
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException("Check your info and try again");
+        } else {
+            return updateUser;
         }
     }
 
@@ -69,5 +73,10 @@ public class UserService {
     @Transactional
     public void addServiceToUser(int userId, int serviceId) {
         userRepository.addServiceToUser(userId, serviceId);
+    }
+
+    @Transactional
+    public void removeServiceFromUser(int userId, int serviceId) {
+        userRepository.removeServiceFromUser(userId, serviceId);
     }
 }

@@ -47,5 +47,5 @@ public class Service {
 
     @Max(5)
     @Column(name = "rating")
-    private int rating;
+    private double rating;
 }

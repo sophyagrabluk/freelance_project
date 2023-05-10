@@ -6,28 +6,24 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
 
-    Optional<ArrayList<Feedback>> findAllByToWhichServiceIdOrderByCreatedDesc(int toWhichUserId);
+    List<Feedback> findAllByToWhichServiceIdOrderByCreatedDesc(int toWhichUserId);
 
     @Modifying
     @Query(
             nativeQuery = true,
             value = "UPDATE feedback_table SET is_deleted = true WHERE id = :id",
             countQuery = "SELECT * FROM feedback_table WHERE id = :id")
-    void deleteFeedback (int id);
+    void deleteFeedback(int id);
 
     @Modifying
     @Query(
             nativeQuery = true,
-            value = "INSERT INTO services_table (rating) WHERE id = :toWhichServiceId " +
-                    "SELECT AVG(rating) FROM feedback_table WHERE id = :toWhichServiceId ",
-            countQuery = "SELECT * FROM feedback_table WHERE id = :id")
-    void updateRating (int toWhichServiceId);
+            value = "UPDATE services_table SET rating = (SELECT avg(rating) FROM feedback_table WHERE to_which_service_id = :toWhichServiceId) WHERE id = :toWhichServiceId",
+            countQuery = "SELECT * FROM services_table WHERE id = :toWhichServiceId")
+    void updateRating(int toWhichServiceId);
 }
-//"SELECT AVG(rating) AS avg FROM feedback_table WHERE id = :toWhichServiceId " +
-//        "INSERT avg INTO rating FROM services_table WHERE id = :toWhichServiceId)"

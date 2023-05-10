@@ -2,13 +2,10 @@ package com.tms.controller;
 
 import com.tms.model.User;
 import com.tms.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,15 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
     UserService userService;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public UserController(UserService userService) {
@@ -36,44 +31,24 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable int id) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<ArrayList<User>> getAllUsers() {
-        ArrayList<User> allUsers = userService.getAllUsers();
-        if (allUsers.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(allUsers, HttpStatus.OK);
+    public ResponseEntity<List<User>> getAllUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        User userResult = userService.createUser(user);
-        if (bindingResult.hasErrors() || userResult == null) {
-            for (ObjectError o : bindingResult.getAllErrors()) {
-                logger.warn("Oops, these are binding errors" + o);
-            }
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
+    public ResponseEntity<User> createUser(@RequestBody User user, BindingResult bd) {
+        userService.createUser(user, bd);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        User userResult = userService.updateUser(user);
-        if (bindingResult.hasErrors() || userResult == null) {
-            for (ObjectError o : bindingResult.getAllErrors()) {
-                logger.warn("Oops, these are binding errors" + o);
-            }
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<User> updateUser(@RequestBody User user, BindingResult bd) {
+        userService.updateUser(user, bd);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping
@@ -82,14 +57,15 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/{userId}/{serviceId}")
-    public ResponseEntity<HttpStatus> addServiceToUser(@PathVariable int userId, @PathVariable int serviceId) {
-        try {
+    @PostMapping("/addFav")
+    public ResponseEntity<HttpStatus> addServiceToUser(@RequestParam int userId, @RequestParam int serviceId) {
             userService.addServiceToUser(userId, serviceId);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            logger.warn("There is exception: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
+
+    @DeleteMapping("/removeFav")
+    public ResponseEntity<HttpStatus> removeServiceFromUser(@RequestParam int userId, @RequestParam int serviceId) {
+        userService.removeServiceFromUser(userId, serviceId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
-}
+    }
