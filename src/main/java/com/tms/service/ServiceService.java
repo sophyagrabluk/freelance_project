@@ -1,9 +1,11 @@
 package com.tms.service;
 
 import com.tms.exception.BadRequestException;
-import com.tms.exception.NotFoundException;
+import com.tms.exception.NotFoundExc;
+import com.tms.mapper.ServiceToServiceResponseMapper;
+import com.tms.model.response.ServiceResponse;
 import com.tms.repository.ServiceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.tms.utils.SectionType;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -17,54 +19,67 @@ import java.util.stream.Collectors;
 public class ServiceService {
 
     ServiceRepository serviceRepository;
+    ServiceToServiceResponseMapper serviceToServiceResponseMapper;
 
-    @Autowired
-    public ServiceService(ServiceRepository serviceRepository) {
+    public ServiceService(ServiceRepository serviceRepository, ServiceToServiceResponseMapper serviceToServiceResponseMapper) {
         this.serviceRepository = serviceRepository;
+        this.serviceToServiceResponseMapper = serviceToServiceResponseMapper;
     }
 
-    public com.tms.model.Service getServiceById(int id) {
-        Optional<com.tms.model.Service> service = serviceRepository.findById(id);
-        if (service.isPresent() && !service.get().isDeleted()) {
-            return service.orElse(null);
+    public ServiceResponse getServiceById(int id) {
+        Optional<com.tms.model.Service> selectedService = serviceRepository.findById(id);
+        if (selectedService.isPresent() && !selectedService.get().isDeleted()) {
+            return serviceToServiceResponseMapper.serviceToResponse(selectedService.get());
         } else {
-            throw new NotFoundException("There is no such service");
+            throw new NotFoundExc("There is no such service");
         }
     }
 
-    public List<com.tms.model.Service> getAllServices() {
-        List<com.tms.model.Service> services = serviceRepository.findAll();
+    public List<ServiceResponse> getAllServices() {
+        List<ServiceResponse> services = serviceRepository.findAll().stream()
+                .filter(service -> !service.isDeleted())
+                .map(service -> serviceToServiceResponseMapper.serviceToResponse(service))
+                .collect(Collectors.toList());
         if (!services.isEmpty()) {
-            return services.stream().filter(service -> !service.isDeleted()).collect(Collectors.toList());
+            return services;
         } else {
-            throw new NotFoundException("There are no services");
+            throw new NotFoundExc("There are no services");
         }
     }
 
-    public List<com.tms.model.Service> findServiceByUserId(int userId) {
-        List<com.tms.model.Service> services = serviceRepository.findServiceByUserId(userId);
+    public List<ServiceResponse> findServiceByUserId(int userId) {
+        List<ServiceResponse> services = serviceRepository.findServiceByUserId(userId).stream()
+                .filter(service -> !service.isDeleted())
+                .map(service -> serviceToServiceResponseMapper.serviceToResponse(service))
+                .collect(Collectors.toList());
         if (!services.isEmpty()){
-            return services.stream().filter(service -> !service.isDeleted()).collect(Collectors.toList());
+            return services;
         } else {
-            throw new NotFoundException("There are no services from this user");
+            throw new NotFoundExc("There are no services from this user");
         }
     }
 
-    public List<com.tms.model.Service> findServiceBySection(String section) {
-        List<com.tms.model.Service> services = serviceRepository.findServicesBySectionOrderByRatingDesc(section);
+    public List<ServiceResponse> findServiceBySection(SectionType section) {
+        List<ServiceResponse> services = serviceRepository.findServicesBySectionOrderByRatingDesc(section).stream()
+                .filter(service -> !service.isDeleted())
+                .map(service -> serviceToServiceResponseMapper.serviceToResponse(service))
+                .collect(Collectors.toList());
         if (!services.isEmpty()){
-            return services.stream().filter(service -> !service.isDeleted()).collect(Collectors.toList());
+            return services;
         } else {
-            throw new NotFoundException("There are no services from this section");
+            throw new NotFoundExc("There are no services from this section");
         }
     }
 
-    public List<com.tms.model.Service> getAllServicesFromHighestRating() {
-        List<com.tms.model.Service> services = serviceRepository.findServicesByOrderByRatingDesc();
+    public List<ServiceResponse> getAllServicesFromHighestRating() {
+        List<ServiceResponse> services = serviceRepository.findServicesByOrderByRatingDesc().stream()
+                .filter(service -> !service.isDeleted())
+                .map(service -> serviceToServiceResponseMapper.serviceToResponse(service))
+                .collect(Collectors.toList());;
         if (!services.isEmpty()){
-            return services.stream().filter(service -> !service.isDeleted()).collect(Collectors.toList());
+            return services;
         } else {
-            throw new NotFoundException("There are no services");
+            throw new NotFoundExc("There are no services");
         }
     }
 

@@ -1,6 +1,6 @@
 package com.tms.service;
 
-import com.tms.exception.NotFoundException;
+import com.tms.exception.NotFoundExc;
 import com.tms.model.Order;
 import com.tms.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class OrderService {
         if (order.isPresent()) {
             return order.orElse(null);
         } else {
-            throw new NotFoundException("There is no such order");
+            throw new NotFoundExc("There is no such order");
         }
     }
 
@@ -45,7 +45,7 @@ public class OrderService {
         if (!orders.isEmpty()) {
             return orders.stream().filter(order -> order.getStatus().contains("IN PROGRESS")).collect(Collectors.toList());
         } else {
-            throw new NotFoundException("There are no active orders");
+            throw new NotFoundExc("There are no active orders");
         }
     }
 
@@ -54,7 +54,7 @@ public class OrderService {
         if (!orders.isEmpty()) {
             return orders.stream().filter(order -> order.getStatus().contains("FINISHED")).collect(Collectors.toList());
         } else {
-            throw new NotFoundException("There are no finished orders");
+            throw new NotFoundExc("There are no finished orders");
         }
     }
 }

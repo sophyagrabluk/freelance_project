@@ -1,10 +1,11 @@
 package com.tms.service;
 
 import com.tms.exception.BadRequestException;
-import com.tms.exception.NotFoundException;
+import com.tms.exception.NotFoundExc;
+import com.tms.mapper.FeedbackToFeedbackResponseMapper;
 import com.tms.model.Feedback;
+import com.tms.model.response.FeedbackResponse;
 import com.tms.repository.FeedbackRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -18,18 +19,22 @@ import java.util.stream.Collectors;
 public class FeedbackService {
 
     FeedbackRepository feedbackRepository;
+    FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper;
 
-    @Autowired
-    public FeedbackService(FeedbackRepository feedbackRepository) {
+    public FeedbackService(FeedbackRepository feedbackRepository, FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper) {
         this.feedbackRepository = feedbackRepository;
+        this.feedbackToFeedbackResponseMapper = feedbackToFeedbackResponseMapper;
     }
 
-    public List<Feedback> getAllFeedbacksForService(int toWhichServiceId) {
-        List<Feedback> feedbacks = feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(toWhichServiceId);
+    public List<FeedbackResponse> getAllFeedbacksForService(int toWhichServiceId) {
+        List<FeedbackResponse> feedbacks = feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(toWhichServiceId)
+                .stream().filter(feedback -> !feedback.isDeleted())
+                .map(feedback -> feedbackToFeedbackResponseMapper.feedbackResponse(feedback))
+                .collect(Collectors.toList());
         if (!feedbacks.isEmpty()) {
-            return feedbacks.stream().filter(feedback -> !feedback.isDeleted()).collect(Collectors.toList());
+            return feedbacks;
         } else {
-            throw new NotFoundException("There are no feedbacks for this service");
+            throw new NotFoundExc("There are no feedbacks for this service");
         }
     }
 

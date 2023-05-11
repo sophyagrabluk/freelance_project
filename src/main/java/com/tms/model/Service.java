@@ -2,8 +2,6 @@ package com.tms.model;
 
 import com.tms.utils.SectionType;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
@@ -21,8 +19,6 @@ import javax.validation.constraints.Max;
 @Data
 @Entity
 @Table(name = "services_table")
-@ToString(exclude = {"feedbackList"})
-@EqualsAndHashCode(exclude = {"feedbackList"})
 public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "service_id_seq_gen")

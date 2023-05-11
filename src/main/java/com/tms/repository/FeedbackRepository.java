@@ -23,7 +23,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
     @Modifying
     @Query(
             nativeQuery = true,
-            value = "UPDATE services_table SET rating = (SELECT avg(rating) FROM feedback_table WHERE to_which_service_id = :toWhichServiceId) WHERE id = :toWhichServiceId",
+            value = "UPDATE services_table SET rating = (SELECT round(avg(rating),1) FROM feedback_table WHERE to_which_service_id = :toWhichServiceId) WHERE id = :toWhichServiceId",
             countQuery = "SELECT * FROM services_table WHERE id = :toWhichServiceId")
     void updateRating(int toWhichServiceId);
 }

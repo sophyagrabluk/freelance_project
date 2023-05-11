@@ -1,7 +1,9 @@
 package com.tms.controller;
 
 import com.tms.model.Service;
+import com.tms.model.response.ServiceResponse;
 import com.tms.service.ServiceService;
+import com.tms.utils.SectionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,27 +32,27 @@ public class ServiceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Service> getServiceById(@PathVariable int id) {
+    public ResponseEntity<ServiceResponse> getServiceById(@PathVariable int id) {
         return new ResponseEntity<>(serviceService.getServiceById(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<Service>> getAllServices() {
+    public ResponseEntity<List<ServiceResponse>> getAllServices() {
         return new ResponseEntity<>(serviceService.getAllServices(), HttpStatus.OK);
     }
 
     @GetMapping("/fromUser/{userId}")
-    public ResponseEntity<List<Service>> findServiceByUserId(@PathVariable int userId) {
+    public ResponseEntity<List<ServiceResponse>> findServiceByUserId(@PathVariable int userId) {
         return new ResponseEntity<>(serviceService.findServiceByUserId(userId), HttpStatus.OK);
     }
 
     @GetMapping("/section/{section}")
-    public ResponseEntity<List<Service>> findServiceBySection(@PathVariable String section) {
+    public ResponseEntity<List<ServiceResponse>> findServiceBySection(@PathVariable SectionType section) {
         return new ResponseEntity<>(serviceService.findServiceBySection(section), HttpStatus.OK);
     }
 
     @GetMapping("/sortByRating")
-    public ResponseEntity<List<Service>> getAllServicesFromHighestRating() {
+    public ResponseEntity<List<ServiceResponse>> getAllServicesFromHighestRating() {
         return new ResponseEntity<>(serviceService.getAllServicesFromHighestRating(), HttpStatus.OK);
     }
 

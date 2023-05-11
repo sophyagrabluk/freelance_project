@@ -12,8 +12,8 @@ import javax.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class ExceptionResolver {
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ExceptionInfo> NotFoundException(NotFoundException e) {
+    @ExceptionHandler(NotFoundExc.class)
+    public ResponseEntity<ExceptionInfo> NotFoundException(NotFoundExc e) {
         return new ResponseEntity<>(new ExceptionInfo(e.getMessage(), HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase()), HttpStatus.NOT_FOUND);
     }
 

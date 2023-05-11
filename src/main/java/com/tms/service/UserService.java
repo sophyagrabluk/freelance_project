@@ -1,10 +1,11 @@
 package com.tms.service;
 
 import com.tms.exception.BadRequestException;
-import com.tms.exception.NotFoundException;
+import com.tms.exception.NotFoundExc;
+import com.tms.mapper.UserToUserResponseMapper;
 import com.tms.model.User;
+import com.tms.model.response.UserResponse;
 import com.tms.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -19,27 +20,31 @@ import java.util.stream.Collectors;
 public class UserService {
 
     UserRepository userRepository;
+    UserToUserResponseMapper userToUserResponseMapper;
 
-    @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserToUserResponseMapper userToUserResponseMapper) {
         this.userRepository = userRepository;
+        this.userToUserResponseMapper = userToUserResponseMapper;
     }
 
-    public User getUserById(int id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent() && !user.get().isDeleted()) {
-            return user.orElse(null);
+    public UserResponse getUserById(int id) {
+        Optional<User> selectedUser = userRepository.findById(id);
+        if (selectedUser.isPresent() && !selectedUser.get().isDeleted()) {
+            return userToUserResponseMapper.userToResponse(selectedUser.get());
         } else {
-            throw new NotFoundException("There is no such user");
+            throw new NotFoundExc("There is no such user");
         }
     }
 
-    public List<User> getAllUsers() {
-        List<User> users = userRepository.findAll();
+    public List<UserResponse> getAllUsers() {
+        List<UserResponse> users = userRepository.findAll().stream()
+                .filter(user -> !user.isDeleted())
+                .map(user -> userToUserResponseMapper.userToResponse(user))
+                .collect(Collectors.toList());
         if (!users.isEmpty()) {
-            return users.stream().filter(user -> !user.isDeleted()).collect(Collectors.toList());
+            return users;
         } else {
-            throw new NotFoundException("There are no users");
+            throw new NotFoundExc("There are no users");
         }
     }
 

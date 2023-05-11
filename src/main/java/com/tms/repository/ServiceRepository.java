@@ -1,6 +1,7 @@
 package com.tms.repository;
 
 import com.tms.model.Service;
+import com.tms.utils.SectionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +16,7 @@ public interface ServiceRepository extends JpaRepository<Service, Integer> {
 
     List<Service> findServicesByOrderByRatingDesc();
 
-    List<Service> findServicesBySectionOrderByRatingDesc(String section);
+    List<Service> findServicesBySectionOrderByRatingDesc(SectionType section);
 
     @Modifying
     @Query(

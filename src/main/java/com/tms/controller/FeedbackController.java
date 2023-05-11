@@ -1,6 +1,7 @@
 package com.tms.controller;
 
 import com.tms.model.Feedback;
+import com.tms.model.response.FeedbackResponse;
 import com.tms.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ public class FeedbackController {
     }
 
     @GetMapping("/{toWhichServiceId}")
-    public ResponseEntity<List<Feedback>> getAllFeedbacksForService(@PathVariable int toWhichServiceId) {
+    public ResponseEntity<List<FeedbackResponse>> getAllFeedbacksForService(@PathVariable int toWhichServiceId) {
         return new ResponseEntity<>(feedbackService.getAllFeedbacksForService(toWhichServiceId), HttpStatus.OK);
     }
 
