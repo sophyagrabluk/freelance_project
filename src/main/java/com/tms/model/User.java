@@ -37,7 +37,8 @@ public class User {
     @Column(name = "login")
     private String login;
 
-    @Column(name = "password")
+    @Size(min = 8, max = 100)
+    @Column(name = "password", updatable = false)
     private String password;
 
     @Column(name = "created", updatable = false)
@@ -52,4 +53,7 @@ public class User {
     @Email
     @Column(name = "email")
     private String email;
+
+    @Column(name = "role", updatable = false)
+    private String role;
 }

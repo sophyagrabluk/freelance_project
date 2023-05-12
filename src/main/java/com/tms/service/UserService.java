@@ -13,7 +13,6 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,12 +27,7 @@ public class UserService {
     }
 
     public UserResponse getUserById(int id) {
-        Optional<User> selectedUser = userRepository.findById(id);
-        if (selectedUser.isPresent() && !selectedUser.get().isDeleted()) {
-            return userToUserResponseMapper.userToResponse(selectedUser.get());
-        } else {
-            throw new NotFoundExc("There is no such user");
-        }
+        return userToUserResponseMapper.userToResponse(getUserFromDb(id));
     }
 
     public List<UserResponse> getAllUsers() {
@@ -51,7 +45,7 @@ public class UserService {
     public User createUser(@Valid User user, BindingResult bindingResult) {
         user.setCreated(new Timestamp(System.currentTimeMillis()));
         user.setChanged(new Timestamp(System.currentTimeMillis()));
-        User newUser = userRepository.save(user);
+        User newUser = saveUserToDb(user);
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Check your info and try again");
         } else {
@@ -64,11 +58,22 @@ public class UserService {
         user.setChanged(new Timestamp(System.currentTimeMillis()));
         User updateUser = userRepository.saveAndFlush(user);
         if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Check your info and try again");
+            throw new BadRequestException("Check your new info and try again");
         } else {
             return updateUser;
         }
     }
+
+//    public User updateUserPassword(@Valid UpdatePasswordRequest request){
+//        User user = getUserFromDb(request.getId());
+//        if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())
+//                && request.getNewPassword().equals(request.getRepeatNewPassword())) {
+//            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+//            return saveUserToDb(user);
+//        } else {
+//            throw new BadRequestException("Check your old and new password and try again");
+//        }
+//    }
 
     @Transactional
     public void deleteUser(int id) {
@@ -83,5 +88,18 @@ public class UserService {
     @Transactional
     public void removeServiceFromUser(int userId, int serviceId) {
         userRepository.removeServiceFromUser(userId, serviceId);
+    }
+
+    private User getUserFromDb(int id){
+        return userRepository.findById(id).filter(user -> !user.isDeleted())
+                .orElseThrow(() -> new NotFoundExc("There is no such user"));
+    }
+
+    private User saveUserToDb(User user){
+        User newUser = userRepository.save(user);
+        if (newUser == null) {
+            throw new BadRequestException("Check your info and try again");
+        }
+        return newUser;
     }
 }

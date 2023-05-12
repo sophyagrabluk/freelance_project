@@ -1,8 +1,10 @@
 package com.tms.controller;
 
+import com.tms.exception.ForbiddenException;
 import com.tms.model.User;
 import com.tms.model.response.UserResponse;
 import com.tms.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -24,6 +27,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -45,10 +49,24 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody User user, BindingResult bd) {
-        userService.updateUser(user, bd);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<User> updateUser(@RequestBody User user, BindingResult bd, Principal principal) {
+        if (principal.getName().equals(user.getLogin())) {
+            userService.updateUser(user, bd);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            throw new ForbiddenException("");
+        }
     }
+
+//    @PutMapping("changePassword")
+//    public ResponseEntity<UserResponse> updateUserPassword(@RequestBody UpdatePasswordRequest request, BindingResult bindingResult) {
+//        if (!bindingResult.hasErrors()) {
+//            userService.updateUserPassword(request);
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.CONFLICT);
+//        }
+//    }
 
     @DeleteMapping
     public ResponseEntity<HttpStatus> deleteUser(@RequestParam int id) {
@@ -58,13 +76,13 @@ public class UserController {
 
     @PostMapping("/addFav")
     public ResponseEntity<HttpStatus> addServiceToUser(@RequestParam int userId, @RequestParam int serviceId) {
-            userService.addServiceToUser(userId, serviceId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
+        userService.addServiceToUser(userId, serviceId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @DeleteMapping("/removeFav")
     public ResponseEntity<HttpStatus> removeServiceFromUser(@RequestParam int userId, @RequestParam int serviceId) {
         userService.removeServiceFromUser(userId, serviceId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    }
+}

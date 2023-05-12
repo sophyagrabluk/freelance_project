@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
@@ -29,4 +31,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             value = "DELETE FROM l_users_services WHERE user_id = :userId AND service_id=:serviceId",
             countQuery = "SELECT * FROM l_users_services WHERE user_id = :userId, service_id=:serviceId")
     void removeServiceFromUser(int userId, int serviceId);
+
+    Optional<User> findUserByLogin(String login);
 }
