@@ -1,8 +1,6 @@
 package com.tms.model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
@@ -19,8 +17,6 @@ import java.sql.Timestamp;
 @Data
 @Entity
 @Table(name = "feedback_table")
-@ToString(exclude = {"service"})
-@EqualsAndHashCode(exclude = {"service"})
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "feedback_id_seq_gen")

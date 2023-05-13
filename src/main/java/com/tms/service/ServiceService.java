@@ -1,11 +1,14 @@
 package com.tms.service;
 
 import com.tms.exception.BadRequestException;
+import com.tms.exception.ForbiddenException;
 import com.tms.exception.NotFoundExc;
 import com.tms.mapper.ServiceToServiceResponseMapper;
 import com.tms.model.response.ServiceResponse;
 import com.tms.repository.ServiceRepository;
+import com.tms.security.CheckingAuthorization;
 import com.tms.utils.SectionType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -18,12 +21,15 @@ import java.util.stream.Collectors;
 @Service
 public class ServiceService {
 
-    ServiceRepository serviceRepository;
-    ServiceToServiceResponseMapper serviceToServiceResponseMapper;
+    private final ServiceRepository serviceRepository;
+    private final ServiceToServiceResponseMapper serviceToServiceResponseMapper;
+    private final CheckingAuthorization checkingAuthorization;
 
-    public ServiceService(ServiceRepository serviceRepository, ServiceToServiceResponseMapper serviceToServiceResponseMapper) {
+    @Autowired
+    public ServiceService(ServiceRepository serviceRepository, ServiceToServiceResponseMapper serviceToServiceResponseMapper, CheckingAuthorization checkingAuthorization) {
         this.serviceRepository = serviceRepository;
         this.serviceToServiceResponseMapper = serviceToServiceResponseMapper;
+        this.checkingAuthorization = checkingAuthorization;
     }
 
     public ServiceResponse getServiceById(int id) {
@@ -38,7 +44,7 @@ public class ServiceService {
     public List<ServiceResponse> getAllServices() {
         List<ServiceResponse> services = serviceRepository.findAll().stream()
                 .filter(service -> !service.isDeleted())
-                .map(service -> serviceToServiceResponseMapper.serviceToResponse(service))
+                .map(serviceToServiceResponseMapper::serviceToResponse)
                 .collect(Collectors.toList());
         if (!services.isEmpty()) {
             return services;
@@ -50,9 +56,9 @@ public class ServiceService {
     public List<ServiceResponse> findServiceByUserId(int userId) {
         List<ServiceResponse> services = serviceRepository.findServiceByUserId(userId).stream()
                 .filter(service -> !service.isDeleted())
-                .map(service -> serviceToServiceResponseMapper.serviceToResponse(service))
+                .map(serviceToServiceResponseMapper::serviceToResponse)
                 .collect(Collectors.toList());
-        if (!services.isEmpty()){
+        if (!services.isEmpty()) {
             return services;
         } else {
             throw new NotFoundExc("There are no services from this user");
@@ -62,9 +68,9 @@ public class ServiceService {
     public List<ServiceResponse> findServiceBySection(SectionType section) {
         List<ServiceResponse> services = serviceRepository.findServicesBySectionOrderByRatingDesc(section).stream()
                 .filter(service -> !service.isDeleted())
-                .map(service -> serviceToServiceResponseMapper.serviceToResponse(service))
+                .map(serviceToServiceResponseMapper::serviceToResponse)
                 .collect(Collectors.toList());
-        if (!services.isEmpty()){
+        if (!services.isEmpty()) {
             return services;
         } else {
             throw new NotFoundExc("There are no services from this section");
@@ -74,35 +80,41 @@ public class ServiceService {
     public List<ServiceResponse> getAllServicesFromHighestRating() {
         List<ServiceResponse> services = serviceRepository.findServicesByOrderByRatingDesc().stream()
                 .filter(service -> !service.isDeleted())
-                .map(service -> serviceToServiceResponseMapper.serviceToResponse(service))
-                .collect(Collectors.toList());;
-        if (!services.isEmpty()){
+                .map(serviceToServiceResponseMapper::serviceToResponse)
+                .collect(Collectors.toList());
+        if (!services.isEmpty()) {
             return services;
         } else {
             throw new NotFoundExc("There are no services");
         }
     }
 
-    public com.tms.model.Service createService(@Valid com.tms.model.Service service, BindingResult bindingResult) {
-        com.tms.model.Service newService = serviceRepository.save(service);
+    public void createService(@Valid com.tms.model.Service service, BindingResult bindingResult) {
+        serviceRepository.save(service);
         if (bindingResult.hasErrors()) {
             throw new BadRequestException("Check your info and try again");
-        } else {
-            return newService;
         }
     }
 
-    public com.tms.model.Service updateService(@Valid com.tms.model.Service service, BindingResult bindingResult) {
-        com.tms.model.Service updateService = serviceRepository.saveAndFlush(service);
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Check your info and try again");
+    public void updateService(com.tms.model.Service service) {
+        com.tms.model.Service gotService = serviceRepository.findById(service.getId()).get();
+        if (checkingAuthorization.check(gotService.getUserLogin())) {
+            serviceRepository.saveAndFlush(service);
         } else {
-            return updateService;
+            throw new ForbiddenException("You can't update not your own service");
         }
     }
 
     @Transactional
     public void deleteService(int id) {
-        serviceRepository.deleteService(id);
+        if (checkingAuthorization.check(getUserLogin(id))) {
+            serviceRepository.deleteService(id);
+        } else {
+            throw new ForbiddenException("You can't delete not your own service");
+        }
+    }
+
+    private String getUserLogin(int id) {
+        return serviceRepository.findById(id).get().getUserLogin();
     }
 }

@@ -63,8 +63,8 @@ public class ServiceController {
     }
 
     @PutMapping
-    public ResponseEntity<HttpStatus> updateService(@RequestBody Service service, BindingResult bd) {
-        serviceService.updateService(service, bd);
+    public ResponseEntity<HttpStatus> updateService(@RequestBody Service service) {
+        serviceService.updateService(service);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

@@ -1,16 +1,19 @@
 package com.tms.service;
 
 import com.tms.exception.BadRequestException;
+import com.tms.exception.ForbiddenException;
 import com.tms.exception.NotFoundExc;
 import com.tms.mapper.UserToUserResponseMapper;
 import com.tms.model.User;
+import com.tms.model.request.UpdatePasswordRequest;
 import com.tms.model.response.UserResponse;
 import com.tms.repository.UserRepository;
+import com.tms.security.CheckingAuthorization;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,12 +21,17 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    UserRepository userRepository;
-    UserToUserResponseMapper userToUserResponseMapper;
+    private final UserRepository userRepository;
+    private final UserToUserResponseMapper userToUserResponseMapper;
+    private final CheckingAuthorization checkingAuthorization;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UserToUserResponseMapper userToUserResponseMapper) {
+    @Autowired
+    public UserService(UserRepository userRepository, UserToUserResponseMapper userToUserResponseMapper, CheckingAuthorization checkingAuthorization, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userToUserResponseMapper = userToUserResponseMapper;
+        this.checkingAuthorization = checkingAuthorization;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponse getUserById(int id) {
@@ -33,7 +41,7 @@ public class UserService {
     public List<UserResponse> getAllUsers() {
         List<UserResponse> users = userRepository.findAll().stream()
                 .filter(user -> !user.isDeleted())
-                .map(user -> userToUserResponseMapper.userToResponse(user))
+                .map(userToUserResponseMapper::userToResponse)
                 .collect(Collectors.toList());
         if (!users.isEmpty()) {
             return users;
@@ -42,64 +50,65 @@ public class UserService {
         }
     }
 
-    public User createUser(@Valid User user, BindingResult bindingResult) {
+    public void createUser(User user) {
         user.setCreated(new Timestamp(System.currentTimeMillis()));
         user.setChanged(new Timestamp(System.currentTimeMillis()));
-        User newUser = saveUserToDb(user);
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Check your info and try again");
+        user.setRole("USER");
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateUser(User user) {
+        if (checkingAuthorization.check(user.getLogin())) {
+            user.setChanged(new Timestamp(System.currentTimeMillis()));
+            userRepository.saveAndFlush(user);
         } else {
-            return newUser;
+            throw new ForbiddenException("You can't update another user information");
         }
     }
 
-
-    public User updateUser(@Valid User user, BindingResult bindingResult) {
-        user.setChanged(new Timestamp(System.currentTimeMillis()));
-        User updateUser = userRepository.saveAndFlush(user);
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Check your new info and try again");
+    @Transactional
+    public void updateUserPassword(UpdatePasswordRequest request) {
+        User user = getUserFromDb(request.getId());
+        if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            String codePass = passwordEncoder.encode(request.getNewPassword());
+            user.setChanged(new Timestamp(System.currentTimeMillis()));
+            userRepository.updateUserPassword(request.getId(), codePass);
         } else {
-            return updateUser;
+            throw new BadRequestException("Check your old and new password and try again");
         }
     }
-
-//    public User updateUserPassword(@Valid UpdatePasswordRequest request){
-//        User user = getUserFromDb(request.getId());
-//        if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())
-//                && request.getNewPassword().equals(request.getRepeatNewPassword())) {
-//            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-//            return saveUserToDb(user);
-//        } else {
-//            throw new BadRequestException("Check your old and new password and try again");
-//        }
-//    }
 
     @Transactional
     public void deleteUser(int id) {
-        userRepository.deleteUser(id);
+        if (checkingAuthorization.check(getUserFromDb(id).getLogin())) {
+            userRepository.deleteUser(id);
+        } else {
+            throw new ForbiddenException("You can't delete another user");
+        }
     }
 
     @Transactional
     public void addServiceToUser(int userId, int serviceId) {
-        userRepository.addServiceToUser(userId, serviceId);
+        if (checkingAuthorization.check(getUserFromDb(userId).getLogin())) {
+            userRepository.addServiceToUser(userId, serviceId);
+        } else {
+            throw new ForbiddenException("You can't add service to another user");
+        }
     }
 
     @Transactional
     public void removeServiceFromUser(int userId, int serviceId) {
-        userRepository.removeServiceFromUser(userId, serviceId);
+        if (checkingAuthorization.check(getUserFromDb(userId).getLogin())) {
+            userRepository.removeServiceFromUser(userId, serviceId);
+        } else {
+            throw new ForbiddenException("You can't delete service from another user");
+        }
     }
 
-    private User getUserFromDb(int id){
+    private User getUserFromDb(int id) {
         return userRepository.findById(id).filter(user -> !user.isDeleted())
                 .orElseThrow(() -> new NotFoundExc("There is no such user"));
-    }
-
-    private User saveUserToDb(User user){
-        User newUser = userRepository.save(user);
-        if (newUser == null) {
-            throw new BadRequestException("Check your info and try again");
-        }
-        return newUser;
     }
 }

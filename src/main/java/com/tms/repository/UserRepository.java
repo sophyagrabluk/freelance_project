@@ -14,6 +14,14 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Query(
             nativeQuery = true,
+            value = "UPDATE users_table SET password = :newPass WHERE id = :id",
+            countQuery = "SELECT * FROM users_table WHERE id = :id")
+    void updateUserPassword(int id, String newPass);
+
+
+    @Modifying
+    @Query(
+            nativeQuery = true,
             value = "UPDATE users_table SET is_deleted = true WHERE id = :id",
             countQuery = "SELECT * FROM users_table WHERE id = :id")
     void deleteUser(int id);

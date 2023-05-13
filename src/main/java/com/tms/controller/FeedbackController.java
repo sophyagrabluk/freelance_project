@@ -1,5 +1,6 @@
 package com.tms.controller;
 
+import com.tms.exception.BadRequestException;
 import com.tms.model.Feedback;
 import com.tms.model.response.FeedbackResponse;
 import com.tms.service.FeedbackService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -36,9 +38,13 @@ public class FeedbackController {
     }
 
     @PostMapping
-    public ResponseEntity<Feedback> createFeedback(@RequestBody Feedback feedback, BindingResult bd) {
-        feedbackService.createFeedback(feedback, bd);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<Feedback> createFeedback(@RequestBody @Valid Feedback feedback, BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
+            feedbackService.createFeedback(feedback);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } else {
+            throw new BadRequestException("Check your info and try again");
+        }
     }
 
     @DeleteMapping

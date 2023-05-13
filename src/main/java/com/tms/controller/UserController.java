@@ -1,7 +1,8 @@
 package com.tms.controller;
 
-import com.tms.exception.ForbiddenException;
+import com.tms.exception.BadRequestException;
 import com.tms.model.User;
+import com.tms.model.request.UpdatePasswordRequest;
 import com.tms.model.response.UserResponse;
 import com.tms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -43,30 +44,34 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user, BindingResult bd) {
-        userService.createUser(user, bd);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody User user, BindingResult bd, Principal principal) {
-        if (principal.getName().equals(user.getLogin())) {
-            userService.updateUser(user, bd);
-            return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<User> createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
+            userService.createUser(user);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } else {
-            throw new ForbiddenException("");
+            throw new BadRequestException("Check your info and try again");
         }
     }
 
-//    @PutMapping("changePassword")
-//    public ResponseEntity<UserResponse> updateUserPassword(@RequestBody UpdatePasswordRequest request, BindingResult bindingResult) {
-//        if (!bindingResult.hasErrors()) {
-//            userService.updateUserPassword(request);
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.CONFLICT);
-//        }
-//    }
+    @PutMapping
+    public ResponseEntity<HttpStatus> updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
+            userService.updateUser(user);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            throw new BadRequestException("Check your new info and try again");
+        }
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<HttpStatus> updateUserPassword(@RequestBody @Valid UpdatePasswordRequest request, BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
+            userService.updateUserPassword(request);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            throw new BadRequestException("Check your new info and try again");
+        }
+    }
 
     @DeleteMapping
     public ResponseEntity<HttpStatus> deleteUser(@RequestParam int id) {

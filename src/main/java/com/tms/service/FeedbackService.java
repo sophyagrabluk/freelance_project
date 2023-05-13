@@ -1,16 +1,13 @@
 package com.tms.service;
 
-import com.tms.exception.BadRequestException;
 import com.tms.exception.NotFoundExc;
 import com.tms.mapper.FeedbackToFeedbackResponseMapper;
 import com.tms.model.Feedback;
 import com.tms.model.response.FeedbackResponse;
 import com.tms.repository.FeedbackRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,8 +15,8 @@ import java.util.stream.Collectors;
 @Service
 public class FeedbackService {
 
-    FeedbackRepository feedbackRepository;
-    FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper;
+    private final FeedbackRepository feedbackRepository;
+    private final FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper;
 
     public FeedbackService(FeedbackRepository feedbackRepository, FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper) {
         this.feedbackRepository = feedbackRepository;
@@ -29,7 +26,7 @@ public class FeedbackService {
     public List<FeedbackResponse> getAllFeedbacksForService(int toWhichServiceId) {
         List<FeedbackResponse> feedbacks = feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(toWhichServiceId)
                 .stream().filter(feedback -> !feedback.isDeleted())
-                .map(feedback -> feedbackToFeedbackResponseMapper.feedbackResponse(feedback))
+                .map(feedbackToFeedbackResponseMapper::feedbackResponse)
                 .collect(Collectors.toList());
         if (!feedbacks.isEmpty()) {
             return feedbacks;
@@ -39,15 +36,10 @@ public class FeedbackService {
     }
 
     @Transactional
-    public Feedback createFeedback(@Valid Feedback feedback, BindingResult bindingResult) {
+    public void createFeedback(Feedback feedback) {
         feedback.setCreated(new Timestamp(System.currentTimeMillis()));
-        Feedback newFeedback = feedbackRepository.save(feedback);
         feedbackRepository.updateRating(feedback.getToWhichServiceId());
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestException("Check your info and try again");
-        } else {
-            return newFeedback;
-        }
+        feedbackRepository.save(feedback);
     }
 
     @Transactional

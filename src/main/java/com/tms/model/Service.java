@@ -38,8 +38,11 @@ public class Service {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", updatable = false)
     private int userId;
+
+    @Column(name = "user_login", updatable = false)
+    private String userLogin;
 
     @Max(5)
     @Column(name = "rating")
