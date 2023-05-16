@@ -39,7 +39,7 @@ public class OrderService {
     }
 
     public void finishOrder(int id) {
-        if (checkingAuthorization.check(getUserLogin(id)) || checkingAuthorization.check(getOwnerUserLogin(id))) {
+        if (checkingAuthorization.check(getUserLogin(id))) {
             orderRepository.finishOrder(id);
         } else {
             throw new ForbiddenException("You can't finish this order");
@@ -74,9 +74,5 @@ public class OrderService {
 
     private String getUserLogin(int id) {
         return orderRepository.getUserLogin(id);
-    }
-
-    private String getOwnerUserLogin(int id) {
-        return orderRepository.getOwnerUserLogin(id);
     }
 }

@@ -48,7 +48,7 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/finish")
+    @PutMapping("")
     public ResponseEntity<Order> finishOrder (@RequestParam int id){
             orderService.finishOrder(id);
             return new ResponseEntity<>(HttpStatus.OK);
