@@ -1,11 +1,10 @@
-package com.tms.controller;
+package com.tms.service;
 
 import com.tms.mapper.UserToUserResponseMapper;
 import com.tms.model.User;
 import com.tms.model.response.UserResponse;
 import com.tms.repository.UserRepository;
 import com.tms.security.CheckingAuthorization;
-import com.tms.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
