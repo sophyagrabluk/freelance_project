@@ -1,6 +1,5 @@
 package com.tms.exception;
 
-
 import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ public class ExceptionResolver {
                 ("Object is not found", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase()),
                 HttpStatus.NOT_FOUND);
     }
-
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionInfo> BadRequestException() {
@@ -43,5 +41,11 @@ public class ExceptionResolver {
     public ResponseEntity<ExceptionInfo> ForbiddenException() {
         return new ResponseEntity<>(new ExceptionInfo("You don't have the right to fulfill this request ",
                 HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase()), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(ObjectIsDeletedException.class)
+    public ResponseEntity<ExceptionInfo> ObjectIsDeletedException() {
+        return new ResponseEntity<>(new ExceptionInfo("This object is already deleted ",
+                HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase()), HttpStatus.BAD_REQUEST);
     }
 }

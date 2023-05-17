@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "feedback_table")
 public class Feedback {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "feedback_id_seq_gen")
     @SequenceGenerator(name = "feedback_id_seq_gen", sequenceName = "feedback_table_id_seq", allocationSize = 1)
@@ -27,16 +28,16 @@ public class Feedback {
     private String comment;
 
     @Max(5)
-    @Column(name = "rating")
+    @Column(name = "rating", updatable = false)
     private int rating;
 
-    @Column(name = "created")
+    @Column(name = "created", updatable = false)
     private Timestamp created;
 
-    @Column(name = "from_which_user_id")
+    @Column(name = "from_which_user_id", updatable = false)
     private int fromWhichUserId;
 
-    @Column(name = "to_which_service_id")
+    @Column(name = "to_which_service_id", updatable = false)
     private int toWhichServiceId;
 
     @Column(name = "is_deleted")

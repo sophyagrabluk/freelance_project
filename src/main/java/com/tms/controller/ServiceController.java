@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping("/service")
 public class ServiceController {
 
-    ServiceService serviceService;
+    private final ServiceService serviceService;
 
     @Autowired
     public ServiceController(ServiceService serviceService) {
@@ -32,23 +32,23 @@ public class ServiceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceResponse> getServiceById(@PathVariable int id) {
-        return new ResponseEntity<>(serviceService.getServiceById(id), HttpStatus.OK);
+    public ResponseEntity<ServiceResponse> getServiceResponseById(@PathVariable int id) {
+        return new ResponseEntity<>(serviceService.getServiceResponseById(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<ServiceResponse>> getAllServices() {
-        return new ResponseEntity<>(serviceService.getAllServices(), HttpStatus.OK);
+    public ResponseEntity<List<ServiceResponse>> getAllServicesResponse() {
+        return new ResponseEntity<>(serviceService.getAllServicesResponse(), HttpStatus.OK);
     }
 
     @GetMapping("/fromUser/{userId}")
-    public ResponseEntity<List<ServiceResponse>> findServiceByUserId(@PathVariable int userId) {
-        return new ResponseEntity<>(serviceService.findServiceByUserId(userId), HttpStatus.OK);
+    public ResponseEntity<List<ServiceResponse>> findServiceResponseByUserId(@PathVariable int userId) {
+        return new ResponseEntity<>(serviceService.findServiceResponseByUserId(userId), HttpStatus.OK);
     }
 
     @GetMapping("/section/{section}")
-    public ResponseEntity<List<ServiceResponse>> findServiceBySection(@PathVariable SectionType section) {
-        return new ResponseEntity<>(serviceService.findServiceBySection(section), HttpStatus.OK);
+    public ResponseEntity<List<ServiceResponse>> findServiceResponseBySection(@PathVariable SectionType section) {
+        return new ResponseEntity<>(serviceService.findServiceResponseBySection(section), HttpStatus.OK);
     }
 
     @GetMapping("/sortByRating")
@@ -71,6 +71,32 @@ public class ServiceController {
     @DeleteMapping
     public ResponseEntity<Service> deleteService(@RequestParam int id) {
         serviceService.deleteService(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<Service> getServiceById(@PathVariable int id) {
+        return new ResponseEntity<>(serviceService.getServiceById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<Service>> getAllServices() {
+        return new ResponseEntity<>(serviceService.getAllServices(), HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/fromUser/{userId}")
+    public ResponseEntity<List<Service>> findServiceByUserId(@PathVariable int userId) {
+        return new ResponseEntity<>(serviceService.findServiceByUserId(userId), HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/section/{section}")
+    public ResponseEntity<List<Service>> findServiceBySection(@PathVariable SectionType section) {
+        return new ResponseEntity<>(serviceService.findServiceBySection(section), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/admin")
+    public ResponseEntity<Service> deleteServiceByAdmin(@RequestParam int id) {
+        serviceService.deleteServiceByAdmin(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

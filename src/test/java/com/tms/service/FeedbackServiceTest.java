@@ -62,7 +62,7 @@ public class FeedbackServiceTest {
     public void getAllFeedbacksForServiceTest() {
         when(feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(id)).thenReturn(feedbacks);
         when(feedbackToFeedbackResponseMapper.feedbackResponse(feedback)).thenReturn(feedbackResponse);
-        assertEquals(feedbackResponses, feedbackService.getAllFeedbacksForService(id));
+        assertEquals(feedbackResponses, feedbackService.getAllFeedbacksResponseForService(id));
     }
 
     @Test

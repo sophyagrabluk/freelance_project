@@ -56,7 +56,7 @@ public class ServiceServiceTest {
         service = new Service();
         service.setId(1);
         service.setName("NameTest");
-        service.setSection(SectionType.design);
+        service.setSection(SectionType.DESIGN);
         service.setDescription("DescriptionTest");
         service.setRating(5.0);
         service.setUserId(1);
@@ -71,7 +71,7 @@ public class ServiceServiceTest {
     public  void getServiceByIdTest() {
         when(serviceRepository.findById(id)).thenReturn(Optional.of(service));
         when(serviceToServiceResponseMapper.serviceToResponse(service)).thenReturn(serviceResponse);
-        ServiceResponse returned = serviceService.getServiceById(id);
+        ServiceResponse returned = serviceService.getServiceResponseById(id);
         verify(serviceRepository).findById(id);
         verify(serviceToServiceResponseMapper).serviceToResponse(service);
         assertEquals(serviceResponse, returned);
@@ -81,7 +81,7 @@ public class ServiceServiceTest {
     public void getAllServicesTest() {
         when(serviceRepository.findAll()).thenReturn(services);
         when(serviceToServiceResponseMapper.serviceToResponse(service)).thenReturn(serviceResponse);
-        assertEquals(serviceResponses, serviceService.getAllServices());
+        assertEquals(serviceResponses, serviceService.getAllServicesResponse());
     }
 
     @Test

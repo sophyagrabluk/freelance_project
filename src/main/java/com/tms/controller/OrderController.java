@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
 
-    OrderService orderService;
+    private final OrderService orderService;
 
     @Autowired
     public OrderController(OrderService orderService) {

@@ -18,7 +18,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             countQuery = "SELECT * FROM users_table WHERE id = :id")
     void updateUserPassword(int id, String newPass);
 
-
     @Modifying
     @Query(
             nativeQuery = true,

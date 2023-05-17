@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 @Data
 public class FeedbackResponse {
 
-    String comment;
-    double rating;
-    Timestamp created;
+    private String comment;
+    private double rating;
+    private Timestamp created;
 }

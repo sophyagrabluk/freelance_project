@@ -34,13 +34,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable int id) {
-        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+    public ResponseEntity<UserResponse> getUserResponseById(@PathVariable int id) {
+        return new ResponseEntity<>(userService.getUserResponseById(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+    public ResponseEntity<List<UserResponse>> getAllUsersResponse() {
+        return new ResponseEntity<>(userService.getAllUsersResponse(), HttpStatus.OK);
     }
 
     @PostMapping
@@ -89,5 +89,21 @@ public class UserController {
     public ResponseEntity<HttpStatus> removeServiceFromUser(@RequestParam int userId, @RequestParam int serviceId) {
         userService.removeServiceFromUser(userId, serviceId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<User>> getAllUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable int id) {
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/admin")
+    public ResponseEntity<HttpStatus> deleteUserByAdmin(@RequestParam int id) {
+        userService.deleteUserByAdmin(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

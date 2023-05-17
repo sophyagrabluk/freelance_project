@@ -20,6 +20,7 @@ import javax.validation.constraints.Max;
 @Entity
 @Table(name = "services_table")
 public class Service {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "service_id_seq_gen")
     @SequenceGenerator(name = "service_id_seq_gen", sequenceName = "services_table_id_seq", allocationSize = 1)

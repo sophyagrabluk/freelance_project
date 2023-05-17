@@ -3,6 +3,7 @@ package com.tms.service;
 import com.tms.exception.BadRequestException;
 import com.tms.exception.ForbiddenException;
 import com.tms.exception.NotFoundExc;
+import com.tms.exception.ObjectIsDeletedException;
 import com.tms.mapper.ServiceToServiceResponseMapper;
 import com.tms.model.response.ServiceResponse;
 import com.tms.repository.ServiceRepository;
@@ -32,7 +33,7 @@ public class ServiceService {
         this.checkingAuthorization = checkingAuthorization;
     }
 
-    public ServiceResponse getServiceById(int id) {
+    public ServiceResponse getServiceResponseById(int id) {
         Optional<com.tms.model.Service> selectedService = serviceRepository.findById(id);
         if (selectedService.isPresent() && !selectedService.get().isDeleted()) {
             return serviceToServiceResponseMapper.serviceToResponse(selectedService.get());
@@ -41,7 +42,7 @@ public class ServiceService {
         }
     }
 
-    public List<ServiceResponse> getAllServices() {
+    public List<ServiceResponse> getAllServicesResponse() {
         List<ServiceResponse> services = serviceRepository.findAll().stream()
                 .filter(service -> !service.isDeleted())
                 .map(serviceToServiceResponseMapper::serviceToResponse)
@@ -53,7 +54,7 @@ public class ServiceService {
         }
     }
 
-    public List<ServiceResponse> findServiceByUserId(int userId) {
+    public List<ServiceResponse> findServiceResponseByUserId(int userId) {
         List<ServiceResponse> services = serviceRepository.findServiceByUserId(userId).stream()
                 .filter(service -> !service.isDeleted())
                 .map(serviceToServiceResponseMapper::serviceToResponse)
@@ -65,7 +66,7 @@ public class ServiceService {
         }
     }
 
-    public List<ServiceResponse> findServiceBySection(SectionType section) {
+    public List<ServiceResponse> findServiceResponseBySection(SectionType section) {
         List<ServiceResponse> services = serviceRepository.findServicesBySectionOrderByRatingDesc(section).stream()
                 .filter(service -> !service.isDeleted())
                 .map(serviceToServiceResponseMapper::serviceToResponse)
@@ -111,6 +112,52 @@ public class ServiceService {
             serviceRepository.deleteService(id);
         } else {
             throw new ForbiddenException("You can't delete not your own service");
+        }
+    }
+
+    public com.tms.model.Service getServiceById(int id) {
+        Optional<com.tms.model.Service> selectedService = serviceRepository.findById(id);
+        if (selectedService.isPresent()) {
+            return selectedService.get();
+        } else {
+            throw new NotFoundExc("There is no such service");
+        }
+    }
+
+    public List<com.tms.model.Service> getAllServices() {
+        List<com.tms.model.Service> services = serviceRepository.findAll();
+        if (!services.isEmpty()) {
+            return services;
+        } else {
+            throw new NotFoundExc("There are no any services");
+        }
+    }
+
+    public List<com.tms.model.Service> findServiceByUserId(int userId) {
+        List<com.tms.model.Service> services = serviceRepository.findServiceByUserId(userId);
+        if (!services.isEmpty()) {
+            return services;
+        } else {
+            throw new NotFoundExc("There are no services from this user");
+        }
+    }
+
+    public List<com.tms.model.Service> findServiceBySection(SectionType section) {
+        List<com.tms.model.Service> services = serviceRepository.findServicesBySectionOrderByRatingDesc(section);
+        if (!services.isEmpty()) {
+            return services;
+        } else {
+            throw new NotFoundExc("There are no services from this section");
+        }
+    }
+
+    @Transactional
+    public void deleteServiceByAdmin(int id) {
+        com.tms.model.Service service = serviceRepository.findById(id).orElseThrow(() -> new NotFoundExc("There is no such service"));
+        if (!service.isDeleted()) {
+            service.setDeleted(true);
+        } else {
+            throw new ObjectIsDeletedException("Service is already deleted");
         }
     }
 

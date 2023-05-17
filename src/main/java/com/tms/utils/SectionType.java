@@ -1,12 +1,13 @@
 package com.tms.utils;
 
 public enum SectionType {
-    design,
-    development,
-    text,
-    translation,
+
+    DESIGN,
+    DEVELOPMENT,
+    TEXT,
+    TRANSLATION,
     SEO,
     SMM,
-    script,
-    video
+    SCRIPT,
+    VIDEO
 }

@@ -3,6 +3,7 @@ package com.tms.service;
 import com.tms.exception.BadRequestException;
 import com.tms.exception.ForbiddenException;
 import com.tms.exception.NotFoundExc;
+import com.tms.exception.ObjectIsDeletedException;
 import com.tms.mapper.UserToUserResponseMapper;
 import com.tms.model.User;
 import com.tms.model.request.UpdatePasswordRequest;
@@ -34,11 +35,11 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserResponse getUserById(int id) {
+    public UserResponse getUserResponseById(int id) {
         return userToUserResponseMapper.userToResponse(getUserFromDb(id));
     }
 
-    public List<UserResponse> getAllUsers() {
+    public List<UserResponse> getAllUsersResponse() {
         List<UserResponse> users = userRepository.findAll().stream()
                 .filter(user -> !user.isDeleted())
                 .map(userToUserResponseMapper::userToResponse)
@@ -104,6 +105,29 @@ public class UserService {
             userRepository.removeServiceFromUser(userId, serviceId);
         } else {
             throw new ForbiddenException("You can't delete service from another user");
+        }
+    }
+
+    public List<User> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        if (!users.isEmpty()) {
+            return users;
+        } else {
+            throw new NotFoundExc("There are no any users");
+        }
+    }
+
+    public User getUserById(int id) {
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundExc("There is no such user"));
+    }
+
+    @Transactional
+    public void deleteUserByAdmin(int id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundExc("There is no such user"));
+        if (!user.isDeleted()) {
+            user.setDeleted(true);
+        } else {
+            throw new ObjectIsDeletedException("User is already deleted");
         }
     }
 

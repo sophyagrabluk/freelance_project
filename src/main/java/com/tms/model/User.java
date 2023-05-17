@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "users_table")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq_gen")
     @SequenceGenerator(name = "user_id_seq_gen", sequenceName = "users_table_id_seq", allocationSize = 1)

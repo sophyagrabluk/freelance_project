@@ -1,6 +1,5 @@
 package com.tms.exception;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

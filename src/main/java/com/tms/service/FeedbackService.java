@@ -1,6 +1,7 @@
 package com.tms.service;
 
 import com.tms.exception.NotFoundExc;
+import com.tms.exception.ObjectIsDeletedException;
 import com.tms.mapper.FeedbackToFeedbackResponseMapper;
 import com.tms.model.Feedback;
 import com.tms.model.response.FeedbackResponse;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
+
     private final FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper;
 
     public FeedbackService(FeedbackRepository feedbackRepository, FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper) {
@@ -23,7 +25,7 @@ public class FeedbackService {
         this.feedbackToFeedbackResponseMapper = feedbackToFeedbackResponseMapper;
     }
 
-    public List<FeedbackResponse> getAllFeedbacksForService(int toWhichServiceId) {
+    public List<FeedbackResponse> getAllFeedbacksResponseForService(int toWhichServiceId) {
         List<FeedbackResponse> feedbacks = feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(toWhichServiceId)
                 .stream().filter(feedback -> !feedback.isDeleted())
                 .map(feedbackToFeedbackResponseMapper::feedbackResponse)
@@ -42,8 +44,35 @@ public class FeedbackService {
         feedbackRepository.save(feedback);
     }
 
+    public void updateFeedback(Feedback feedback) {
+        if (feedbackRepository.findById(feedback.getId()).isPresent()) {
+            feedbackRepository.updateFeedback(feedback.getId(), feedback.getComment());
+        } else {
+            throw new NotFoundExc("There is no this feedback");
+        }
+    }
+
     @Transactional
     public void deleteFeedback(int id) {
         feedbackRepository.deleteFeedback(id);
+    }
+
+    public List<Feedback> getAllFeedbacksForService(int toWhichServiceId) {
+        List<Feedback> feedbacks = feedbackRepository.findAllByToWhichServiceIdOrderByCreatedDesc(toWhichServiceId);
+        if (!feedbacks.isEmpty()) {
+            return feedbacks;
+        } else {
+            throw new NotFoundExc("There are no any feedbacks for this service");
+        }
+    }
+
+    @Transactional
+    public void deleteFeedbackByAdmin(int id) {
+        Feedback feedback = feedbackRepository.findById(id).orElseThrow(() -> new NotFoundExc("There is no such feedback"));
+        if (!feedback.isDeleted()) {
+            feedback.setDeleted(true);
+        } else {
+            throw new ObjectIsDeletedException("Feedback is already deleted");
+        }
     }
 }

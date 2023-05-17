@@ -55,7 +55,7 @@ Application use PostgreSQL database. For start the application you need Postgres
 
 <hr>
 
-The technology stack of this project: Java, Spring (Boot, Security, Data), PostgreSQL,
-Lombok, Swagger, Mockito.
+The technology stack of this project: Java, Spring (Boot, Security, Data), Hibernate, PostgreSQL,
+Lombok, AOP, Swagger, Mockito.
 
 <br>

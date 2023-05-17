@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class ServiceResponse {
 
-    private String name;
+    private  String name;
     private SectionType section;
     private String description;
     private double rating;
