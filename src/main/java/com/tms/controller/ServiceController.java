@@ -4,6 +4,7 @@ import com.tms.model.Service;
 import com.tms.model.response.ServiceResponse;
 import com.tms.service.ServiceService;
 import com.tms.utils.SectionType;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,16 +42,19 @@ public class ServiceController {
         return new ResponseEntity<>(serviceService.getAllServicesResponse(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Give all services provided by one user")
     @GetMapping("/fromUser/{userId}")
     public ResponseEntity<List<ServiceResponse>> findServiceResponseByUserId(@PathVariable int userId) {
         return new ResponseEntity<>(serviceService.findServiceResponseByUserId(userId), HttpStatus.OK);
     }
 
+    @Operation(summary = "Give all services from one section")
     @GetMapping("/section/{section}")
     public ResponseEntity<List<ServiceResponse>> findServiceResponseBySection(@PathVariable SectionType section) {
         return new ResponseEntity<>(serviceService.findServiceResponseBySection(section), HttpStatus.OK);
     }
 
+    @Operation(summary = "Give all available services according to rating")
     @GetMapping("/sortByRating")
     public ResponseEntity<List<ServiceResponse>> getAllServicesFromHighestRating() {
         return new ResponseEntity<>(serviceService.getAllServicesFromHighestRating(), HttpStatus.OK);
@@ -74,21 +78,25 @@ public class ServiceController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Provide all information for one service in database (including deleted)")
     @GetMapping("/admin/{id}")
     public ResponseEntity<Service> getServiceById(@PathVariable int id) {
         return new ResponseEntity<>(serviceService.getServiceById(id), HttpStatus.OK);
     }
 
+    @Operation(summary = "Provide all services' information in database (including deleted)")
     @GetMapping("/admin")
     public ResponseEntity<List<Service>> getAllServices() {
         return new ResponseEntity<>(serviceService.getAllServices(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Give all services' information provided by one user(including deleted)")
     @GetMapping("/admin/fromUser/{userId}")
     public ResponseEntity<List<Service>> findServiceByUserId(@PathVariable int userId) {
         return new ResponseEntity<>(serviceService.findServiceByUserId(userId), HttpStatus.OK);
     }
 
+    @Operation(summary = "Give all services' information from one section(including deleted)")
     @GetMapping("/admin/section/{section}")
     public ResponseEntity<List<Service>> findServiceBySection(@PathVariable SectionType section) {
         return new ResponseEntity<>(serviceService.findServiceBySection(section), HttpStatus.OK);

@@ -85,17 +85,17 @@ public class ServiceServiceTest {
     }
 
     @Test
-    public void findServiceByUserIdTest(){
+    public void findServiceResponseByUserIdTest(){
         when(serviceRepository.findServiceByUserId(id)).thenReturn(services);
         when(serviceToServiceResponseMapper.serviceToResponse(service)).thenReturn(serviceResponse);
-        assertEquals(serviceResponses, serviceService.findServiceByUserId(id));
+        assertEquals(serviceResponses, serviceService.findServiceResponseByUserId(id));
     }
 
     @Test
-    public void findServiceBySectionTest() {
+    public void findServiceResponseBySectionTest() {
         when(serviceRepository.findServicesBySectionOrderByRatingDesc(service.getSection())).thenReturn(services);
         when(serviceToServiceResponseMapper.serviceToResponse(service)).thenReturn(serviceResponse);
-        assertEquals(serviceResponses, serviceService.findServiceBySection(service.getSection()));
+        assertEquals(serviceResponses, serviceService.findServiceResponseBySection(service.getSection()));
     }
 
     @Test

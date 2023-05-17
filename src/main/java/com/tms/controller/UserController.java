@@ -5,6 +5,7 @@ import com.tms.model.User;
 import com.tms.model.request.UpdatePasswordRequest;
 import com.tms.model.response.UserResponse;
 import com.tms.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,23 +80,27 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Add service to user's Favourite")
     @PostMapping("/addFav")
     public ResponseEntity<HttpStatus> addServiceToUser(@RequestParam int userId, @RequestParam int serviceId) {
         userService.addServiceToUser(userId, serviceId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(summary = "Remove service from user's Favourite")
     @DeleteMapping("/removeFav")
     public ResponseEntity<HttpStatus> removeServiceFromUser(@RequestParam int userId, @RequestParam int serviceId) {
         userService.removeServiceFromUser(userId, serviceId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(summary = "Provide all users' information in database (including deleted)")
     @GetMapping("/admin")
     public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Provide all information from one user in database")
     @GetMapping("/admin/{id}")
     public ResponseEntity<User> getUserById(@PathVariable int id) {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);

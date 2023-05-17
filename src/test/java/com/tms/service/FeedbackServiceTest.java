@@ -4,6 +4,7 @@ import com.tms.mapper.FeedbackToFeedbackResponseMapper;
 import com.tms.model.Feedback;
 import com.tms.model.response.FeedbackResponse;
 import com.tms.repository.FeedbackRepository;
+import com.tms.security.CheckingAuthorization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -30,6 +32,9 @@ public class FeedbackServiceTest {
 
     @Mock
     private FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper;
+
+    @Mock
+    private CheckingAuthorization checkingAuthorization;
 
     private int id;
 
@@ -50,6 +55,7 @@ public class FeedbackServiceTest {
         feedback.setComment("CommentTest");
         feedback.setRating(5);
         feedback.setToWhichServiceId(1);
+        feedback.setFromWhichUserLogin("LoginTest");
         feedback.setFromWhichUserId(1);
         feedback.setCreated(time);
         feedback.setDeleted(false);
@@ -71,6 +77,14 @@ public class FeedbackServiceTest {
         feedbackService.createFeedback(feedback);
         verify(feedbackRepository).updateRating(id);
         verify(feedbackRepository).save(feedback);
+    }
+
+    @Test
+    public void updateFeedbackTest() {
+        when(checkingAuthorization.check(feedback.getFromWhichUserLogin())).thenReturn(true);
+        when(feedbackRepository.findById(id)).thenReturn(Optional.of(feedback));;
+        feedbackService.updateFeedback(feedback);
+        verify(feedbackRepository).updateFeedback(id, feedback.getComment());
     }
 
     @Test

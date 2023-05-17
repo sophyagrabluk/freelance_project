@@ -35,22 +35,18 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.DELETE, "/user").hasRole("USER")
                 .antMatchers(HttpMethod.DELETE, "/user/removeFav").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/user/admin").hasRole("ADMIN")
-
-
                 .antMatchers(HttpMethod.GET, "/service/admin").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/service/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/service").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.PUT, "/service/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.PUT, "/service").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/service").hasRole("USER")
                 .antMatchers(HttpMethod.DELETE, "/service/admin").hasRole("ADMIN")
-
                 .antMatchers(HttpMethod.GET, "/feedback/{toWhichServiceId}").permitAll()
                 .antMatchers(HttpMethod.GET, "/feedback/admin/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/feedback").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.PUT, "/feedback/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.PUT, "/feedback").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/feedback").hasRole("USER")
                 .antMatchers(HttpMethod.DELETE, "/feedback/admin").hasRole("ADMIN")
-
                 .antMatchers(HttpMethod.GET, "/order/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.POST, "/order/**").hasAnyRole("USER")
                 .antMatchers(HttpMethod.PUT, "/order/**").hasAnyRole("USER")

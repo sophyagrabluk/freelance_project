@@ -4,6 +4,7 @@ import com.tms.exception.BadRequestException;
 import com.tms.model.Feedback;
 import com.tms.model.response.FeedbackResponse;
 import com.tms.service.FeedbackService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ public class FeedbackController {
         return new ResponseEntity<>(feedbackService.getAllFeedbacksResponseForService(toWhichServiceId), HttpStatus.OK);
     }
 
+    @Operation(summary = "Create feedback for service and count common rating")
     @PostMapping
     public ResponseEntity<Feedback> createFeedback(@RequestBody @Valid Feedback feedback, BindingResult bindingResult) {
         if (!bindingResult.hasErrors()) {
@@ -47,6 +49,7 @@ public class FeedbackController {
         }
     }
 
+    @Operation(summary = "Update feedback's comment")
     @PutMapping
     public ResponseEntity<HttpStatus> updateFeedback(@RequestBody Feedback feedback){
         feedbackService.updateFeedback(feedback);
@@ -59,6 +62,7 @@ public class FeedbackController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Provide all all feedbacks' information (including deleted) for one service")
     @GetMapping("/admin/{toWhichServiceId}")
     public ResponseEntity<List<Feedback>> getAllFeedbacksForService(@PathVariable int toWhichServiceId) {
         return new ResponseEntity<>(feedbackService.getAllFeedbacksForService(toWhichServiceId), HttpStatus.OK);

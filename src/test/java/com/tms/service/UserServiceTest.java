@@ -79,7 +79,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserByIdTest() {
+    public void getUserResponseByIdTest() {
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(userToUserResponseMapper.userToResponse(user)).thenReturn(userResponse);
         UserResponse returned = userService.getUserResponseById(id);
@@ -89,7 +89,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getAllUsersTest() {
+    public void getAllUsersResponseTest() {
         when(userRepository.findAll()).thenReturn(users);
         when(userToUserResponseMapper.userToResponse(user)).thenReturn(userResponse);
         assertEquals(userResponses, userService.getAllUsersResponse());

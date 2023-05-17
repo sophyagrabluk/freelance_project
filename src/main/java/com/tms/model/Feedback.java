@@ -28,16 +28,19 @@ public class Feedback {
     private String comment;
 
     @Max(5)
-    @Column(name = "rating", updatable = false)
+    @Column(name = "rating")
     private int rating;
 
-    @Column(name = "created", updatable = false)
+    @Column(name = "created")
     private Timestamp created;
 
-    @Column(name = "from_which_user_id", updatable = false)
+    @Column(name = "from_which_user_id")
     private int fromWhichUserId;
 
-    @Column(name = "to_which_service_id", updatable = false)
+    @Column(name = "from_which_user_login")
+    private String fromWhichUserLogin;
+
+    @Column(name = "to_which_service_id")
     private int toWhichServiceId;
 
     @Column(name = "is_deleted")

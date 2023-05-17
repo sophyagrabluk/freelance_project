@@ -1,11 +1,14 @@
 package com.tms.service;
 
+import com.tms.exception.ForbiddenException;
 import com.tms.exception.NotFoundExc;
 import com.tms.exception.ObjectIsDeletedException;
 import com.tms.mapper.FeedbackToFeedbackResponseMapper;
 import com.tms.model.Feedback;
 import com.tms.model.response.FeedbackResponse;
 import com.tms.repository.FeedbackRepository;
+import com.tms.security.CheckingAuthorization;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,9 +23,13 @@ public class FeedbackService {
 
     private final FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper;
 
-    public FeedbackService(FeedbackRepository feedbackRepository, FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper) {
+    private final CheckingAuthorization checkingAuthorization;
+
+    @Autowired
+    public FeedbackService(FeedbackRepository feedbackRepository, FeedbackToFeedbackResponseMapper feedbackToFeedbackResponseMapper, CheckingAuthorization checkingAuthorization) {
         this.feedbackRepository = feedbackRepository;
         this.feedbackToFeedbackResponseMapper = feedbackToFeedbackResponseMapper;
+        this.checkingAuthorization = checkingAuthorization;
     }
 
     public List<FeedbackResponse> getAllFeedbacksResponseForService(int toWhichServiceId) {
@@ -44,11 +51,16 @@ public class FeedbackService {
         feedbackRepository.save(feedback);
     }
 
+    @Transactional
     public void updateFeedback(Feedback feedback) {
-        if (feedbackRepository.findById(feedback.getId()).isPresent()) {
-            feedbackRepository.updateFeedback(feedback.getId(), feedback.getComment());
+        if (checkingAuthorization.check(getUserLogin(feedback.getId()))) {
+            if (feedbackRepository.findById(feedback.getId()).isPresent()) {
+                feedbackRepository.updateFeedback(feedback.getId(), feedback.getComment());
+            } else {
+                throw new NotFoundExc("There is no this feedback");
+            }
         } else {
-            throw new NotFoundExc("There is no this feedback");
+            throw new ForbiddenException("You can't update feedback from another user");
         }
     }
 
@@ -74,5 +86,11 @@ public class FeedbackService {
         } else {
             throw new ObjectIsDeletedException("Feedback is already deleted");
         }
+    }
+
+    private String getUserLogin(int id) {
+        Feedback feedback = feedbackRepository.findById(id).orElseThrow
+                (() -> new NotFoundExc("There are no any feedbacks for this service"));
+        return feedback.getFromWhichUserLogin();
     }
 }
