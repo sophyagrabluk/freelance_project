@@ -34,9 +34,6 @@ public class Feedback {
     @Column(name = "created")
     private Timestamp created;
 
-    @Column(name = "from_which_user_id")
-    private int fromWhichUserId;
-
     @Column(name = "from_which_user_login")
     private String fromWhichUserLogin;
 

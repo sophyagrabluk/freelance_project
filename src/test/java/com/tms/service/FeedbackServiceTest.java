@@ -11,6 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +60,6 @@ public class FeedbackServiceTest {
         feedback.setRating(5);
         feedback.setToWhichServiceId(1);
         feedback.setFromWhichUserLogin("LoginTest");
-        feedback.setFromWhichUserId(1);
         feedback.setCreated(time);
         feedback.setDeleted(false);
         feedbacks.add(feedback);
@@ -73,6 +76,11 @@ public class FeedbackServiceTest {
 
     @Test
     public void createFeedbackTest() {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("LoginTest");
         feedback.setCreated(time);
         feedbackService.createFeedback(feedback);
         verify(feedbackRepository).updateRating(id);
@@ -82,7 +90,7 @@ public class FeedbackServiceTest {
     @Test
     public void updateFeedbackTest() {
         when(checkingAuthorization.check(feedback.getFromWhichUserLogin())).thenReturn(true);
-        when(feedbackRepository.findById(id)).thenReturn(Optional.of(feedback));;
+        when(feedbackRepository.findById(id)).thenReturn(Optional.of(feedback));
         feedbackService.updateFeedback(feedback);
         verify(feedbackRepository).updateFeedback(id, feedback.getComment());
     }

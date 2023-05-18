@@ -9,6 +9,7 @@ import com.tms.model.response.FeedbackResponse;
 import com.tms.repository.FeedbackRepository;
 import com.tms.security.CheckingAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -46,6 +47,7 @@ public class FeedbackService {
 
     @Transactional
     public void createFeedback(Feedback feedback) {
+        feedback.setFromWhichUserLogin(SecurityContextHolder.getContext().getAuthentication().getName());
         feedback.setCreated(new Timestamp(System.currentTimeMillis()));
         feedbackRepository.updateRating(feedback.getToWhichServiceId());
         feedbackRepository.save(feedback);
