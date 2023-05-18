@@ -1,10 +1,11 @@
-package com.tms.service;
+package com.tms;
 
 import com.tms.mapper.FeedbackToFeedbackResponseMapper;
 import com.tms.model.Feedback;
 import com.tms.model.response.FeedbackResponse;
 import com.tms.repository.FeedbackRepository;
 import com.tms.security.CheckingAuthorization;
+import com.tms.service.FeedbackService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

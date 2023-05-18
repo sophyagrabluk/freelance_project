@@ -1,8 +1,9 @@
-package com.tms.service;
+package com.tms;
 
 import com.tms.model.Order;
 import com.tms.repository.OrderRepository;
 import com.tms.security.CheckingAuthorization;
+import com.tms.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
